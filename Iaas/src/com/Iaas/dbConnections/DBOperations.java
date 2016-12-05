@@ -88,4 +88,49 @@ public class DBOperations {
 		List<ViewSensorDetailsVO> userSensorStats = dbconn.getUserSensorStats(sensorId);
 		return userSensorStats;
 	}
+	
+	// Billing Module @ Author -- Anushree
+	
+	public List<BillingDetails> viewBillDetails(String userId) throws ClassNotFoundException, SQLException{
+		DBConnections dbConnection = new DBConnections();
+		List<BillingDetails> userBillList= dbConnection.getBillDetails(userId);
+		return userBillList;
+	}
+	
+	public List<PaymentHistory> viewPaymentHistory(String userId) throws ClassNotFoundException, SQLException{
+		DBConnections dbConnection = new DBConnections();
+		List<PaymentHistory> userBillList= dbConnection.getPaymentHistory(userId);
+		return userBillList;
+	}
+	
+	public void createInvoice(HttpServletRequest request,String userId) throws ClassNotFoundException, SQLException{
+		DBConnections dbConnection = new DBConnections();
+		dbConnection.createinvoice(request,userId);
+	}
+	
+	public int getTotalCost(String userId) throws ClassNotFoundException, SQLException{
+		DBConnections dbConnection = new DBConnections();
+		int total_cost = dbConnection.totalcost(userId);
+		return total_cost;
+	
+	}
+	public int getAmountPaid(String userId) throws ClassNotFoundException, SQLException{
+		DBConnections dbConnection = new DBConnections();
+		int amount_paid = dbConnection.amountpaid(userId);
+		return amount_paid;
+	
+	}
+	
+	public List<Card_details> getCardDetails(String userId) throws ClassNotFoundException, SQLException{
+		DBConnections dbConnection = new DBConnections();
+		List<Card_details> card_details = dbConnection.fetchCardDetails(userId);
+		return card_details;
+	}
+
+	public List<Invoice> fetchinvoicedetails(String userId) throws ClassNotFoundException, SQLException{
+		DBConnections dbConnection = new DBConnections();
+		List<Invoice> invoice = dbConnection.getinvoicedetails(userId);
+		return invoice;
+	}
+	//Billing Module Ends
 }
