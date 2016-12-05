@@ -263,4 +263,165 @@ public class DBConnections {
 		Date convertedDate = formatter.parse(date);
 		return convertedDate;
 	}
+	
+	//Billing Module -- @ Author Anushree
+	
+	public List<BillingDetails> getBillDetails(String userId) throws ClassNotFoundException, SQLException{
+		Connection dBConnection = createDbConnection();
+		List<BillingDetails> userBillList = new ArrayList<>();
+		Statement stmt = dBConnection.createStatement();
+		String query = ("select * from sensor_stat where sensor_id in (select sensor_id from user_sensor where user_id = '" + userId+"');");
+		ResultSet result = stmt.executeQuery(query);
+		int total_cost = 0;
+		while(result.next()){
+			BillingDetails billingDetails = new BillingDetails();
+			billingDetails.setSensor_id(result.getString("sensor_id"));
+			billingDetails.setStart_time(result.getString("start_time"));
+			billingDetails.setEnd_time(result.getString("end_time"));
+			billingDetails.setSession_cost(result.getInt("session_cost"));
+			total_cost = total_cost + result.getInt("session_cost");
+			userBillList.add(billingDetails);
+		}
+		return userBillList;
+	}
+	
+	public List<PaymentHistory> getPaymentHistory(String userId) throws ClassNotFoundException, SQLException{
+		Connection dBConnection = createDbConnection();
+		List<PaymentHistory> PaymentHistory = new ArrayList<>();
+		Statement stmt = dBConnection.createStatement();
+		String query = "select bill_id,user_name,billed_storage,billed_hours,card_used,amount_paid,status from invoice where user_id='"+ userId+"';";
+		ResultSet result = stmt.executeQuery(query);
+		while(result.next()){
+			PaymentHistory paymentDetails = new PaymentHistory();
+			paymentDetails.setBill_id(result.getInt("bill_id"));
+			paymentDetails.setUser_name(result.getString("user_name"));
+			paymentDetails.setBilled_storage(result.getInt("billed_storage"));
+			paymentDetails.setBilled_hours(result.getInt("billed_hours"));
+			paymentDetails.setCard_used(result.getString("card_used"));
+			paymentDetails.setAmount_paid(result.getInt("amount_paid"));
+			paymentDetails.setStatus(result.getString("status"));
+			PaymentHistory.add(paymentDetails);
+		}
+		return PaymentHistory;
+	}
+	
+	public void createinvoice(HttpServletRequest request,String userId) throws ClassNotFoundException, SQLException{
+		Connection dBConnection = createDbConnection();
+		List<Invoice> invoice = new ArrayList<>();
+		int bill_id = 0;
+		int amount_paid = Integer.parseInt(request.getParameter("amt").toString());
+		
+		String query0 = ("select max(bill_id) from invoice;");
+		Statement st0 = dBConnection.createStatement();
+		ResultSet rs0 = st0.executeQuery(query0);
+		if(rs0!=null && rs0.next())
+			bill_id = rs0.getInt(1) + 1;
+		else
+			bill_id =  1;
+		String user_name = null;
+		Long card_used = 0L;
+		
+		String query1 = ("select name from user where user_id = '"+userId+"';");
+		ResultSet rs1 = st0.executeQuery(query1);
+		if(rs1.next()){
+			user_name = rs1.getString("name");
+		}
+		
+		String query2 = ("select card_number from card_details where user_id = '"+userId+"';");
+		ResultSet rs2 = st0.executeQuery(query2);
+		if(rs2.next())
+			card_used = rs2.getLong("card_number");
+			
+		
+		String createinvoice = ("insert into invoice (bill_id,user_id,user_name,card_used,amount_paid,status) values ("+bill_id+","+userId+",'"+user_name+"',"+card_used+","+amount_paid+","+"'Paid')");
+		Statement st1 = dBConnection.createStatement();
+		st1.executeUpdate(createinvoice);
+		
+		
+	}
+	
+	public int totalcost(String userId) throws ClassNotFoundException, SQLException{
+		Connection dBConnection = createDbConnection();
+		int cost = 0;
+		
+		String query0 = ("select session_cost from sensor_stat where sensor_id in (select sensor_id from user_sensor where user_id = '" + userId+"');");
+		Statement st0 = dBConnection.createStatement();
+		ResultSet rs0 = st0.executeQuery(query0);
+		
+			while(rs0.next())
+				cost=cost+rs0.getInt("session_cost");
+		
+			dBConnection.close();
+		return cost;
+		
+	}
+	
+	public int amountpaid(String userId) throws ClassNotFoundException, SQLException{
+		Connection dBConnection = createDbConnection();
+		int amt = 0;
+		
+		String query0 = ("select amount_paid from invoice where user_id = '" + userId+"';");
+		Statement st0 = dBConnection.createStatement();
+		ResultSet rs0 = st0.executeQuery(query0);
+		
+			while(rs0.next())
+				amt=amt+rs0.getInt("amount_paid");
+		
+		
+		return amt;
+		
+	}
+	
+	public List<Card_details> fetchCardDetails(String userId) throws ClassNotFoundException, SQLException{
+		Connection dBConnection = createDbConnection();
+		
+		List<Card_details> cardDetails = new ArrayList<>();
+		String query0 = ("select * from card_details where  user_id = '" + userId+"';");
+		Statement st0 = dBConnection.createStatement();
+		ResultSet rs0 = st0.executeQuery(query0);
+		
+		while(rs0.next())
+		{
+			Card_details card_Details = new Card_details();
+			card_Details.setCard_number(rs0.getLong("card_number"));
+			card_Details.setExp_date(rs0.getInt("exp_date"));
+			card_Details.setCvv(rs0.getInt("cvv"));
+			card_Details.setName_on_card(rs0.getString("name_on_card"));
+			cardDetails.add(card_Details);
+			
+		}
+			
+		
+		
+		return cardDetails;
+		
+	}
+
+	public List<Invoice> getinvoicedetails(String userId) throws ClassNotFoundException, SQLException{
+		Connection dBConnection = createDbConnection();
+		List<Invoice> invoicedata = new ArrayList<>();
+		String query0 = ("select max(bill_id) from invoice where user_id = '" + userId+"';");
+		Statement st0 = dBConnection.createStatement();
+		ResultSet rs0 = st0.executeQuery(query0);
+		
+		int bill_id = 0;
+		if(rs0!=null && rs0.next())
+			bill_id = rs0.getInt(1);
+		
+		
+		String query1 = ("select bill_id,user_name, card_used,amount_paid,status from invoice where bill_id='"+bill_id +"' and user_id = '"+userId+"'");
+		ResultSet rs1 = st0.executeQuery(query1);
+		while(rs1.next()){
+			Invoice invoice = new Invoice();
+			invoice.setBill_id(rs1.getInt("bill_id"));
+			invoice.setUser_name(rs1.getString("user_name"));
+			invoice.setCard_used(rs1.getLong("card_used"));
+			invoice.setAmount_paid(rs1.getInt("amount_paid"));
+			invoice.setStatus(rs1.getString("status"));
+			invoicedata.add(invoice);
+		}
+		return invoicedata;
+	}
+	
+	//Billing Module Ends
 }
