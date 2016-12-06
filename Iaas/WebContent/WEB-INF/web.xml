@@ -60,6 +60,22 @@
 		<servlet-name>terminateSensor</servlet-name>
 		<url-pattern>/terminateSensor</url-pattern>
 	</servlet-mapping>
+	<servlet>
+  <servlet-name>billing</servlet-name>
+    <servlet-class>com.Iaas.Servlets.BillingServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>billing</servlet-name>
+    <url-pattern>/billing</url-pattern>
+  </servlet-mapping>
+<servlet>  
+  <servlet-name>payment</servlet-name>
+    <servlet-class>com.Iaas.Servlets.PaymentServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>payment</servlet-name>
+    <url-pattern>/payment</url-pattern>
+  </servlet-mapping>
 	<listener>
 		<listener-class>com.Iaas.Util.Listener</listener-class>
 	</listener>
