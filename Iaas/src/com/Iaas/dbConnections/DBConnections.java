@@ -384,37 +384,54 @@ public class DBConnections {
 		UtilConstants.setCitiesList(cityList);
 		closeConnection(dBConnection);
 	}
-	// Billing Module -- @ Author Anushree
-
-	public List<BillingDetails> getBillDetails(String userId) throws ClassNotFoundException, SQLException {
+	
+	//Billing Module -- @ Author Anushree
+	
+	public static int calculateSessionCost(String startTime, Date endTime) throws ParseException{
+		long seconds = (endTime.getTime()-convertStringToDate(startTime).getTime())/1000;
+		double hours = seconds/3600;
+		int cost = (int) ((hours*UtilConstants.perHourUsage/1024)*UtilConstants.costPerGb + (hours*UtilConstants.costPerHour));
+		return cost;
+	}
+	public List<BillingDetails> getBillDetails(String userId) throws ClassNotFoundException, SQLException{
 		Connection dBConnection = createDbConnection();
 		List<BillingDetails> userBillList = new ArrayList<>();
 		Statement stmt = dBConnection.createStatement();
-		String query = ("select * from sensor_stat where sensor_id in (select sensor_id from user_sensor where user_id = '"
-				+ userId + "');");
+		Date today = new Date();
+		String query = ("select * from sensor_stat where sensor_id in (select sensor_id from user_sensor where user_id = '" + userId+"');");
 		ResultSet result = stmt.executeQuery(query);
 		int total_cost = 0;
-		while (result.next()) {
+		try{
+		while(result.next()){
 			BillingDetails billingDetails = new BillingDetails();
 			billingDetails.setSensor_id(result.getString("sensor_id"));
 			billingDetails.setStart_time(result.getString("start_time"));
-			billingDetails.setEnd_time(result.getString("end_time"));
-			billingDetails.setSession_cost(result.getInt("session_cost"));
+			if(result.getString("end_time")!=null && result.getString("end_time").length()!=0)
+				billingDetails.setEnd_time(result.getString("end_time"));
+			else
+				billingDetails.setEnd_time("Running");
+			if(result.getString("end_time")!=null && result.getString("end_time").length()!=0)
+				billingDetails.setSession_cost(result.getInt("session_cost"));
+			else
+				billingDetails.setSession_cost(calculateSessionCost(result.getString("start_time"),today));
 			total_cost = total_cost + result.getInt("session_cost");
 			userBillList.add(billingDetails);
+			
 		}
 		closeConnection(dBConnection);
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
 		return userBillList;
 	}
-
-	public List<PaymentHistory> getPaymentHistory(String userId) throws ClassNotFoundException, SQLException {
+	
+	public List<PaymentHistory> getPaymentHistory(String userId) throws ClassNotFoundException, SQLException{
 		Connection dBConnection = createDbConnection();
 		List<PaymentHistory> PaymentHistory = new ArrayList<>();
 		Statement stmt = dBConnection.createStatement();
-		String query = "select bill_id,user_name,billed_storage,billed_hours,card_used,amount_paid,status from invoice where user_id='"
-				+ userId + "';";
+		String query = "select bill_id,user_name,billed_storage,billed_hours,card_used,amount_paid,status from invoice where user_id='"+ userId+"';";
 		ResultSet result = stmt.executeQuery(query);
-		while (result.next()) {
+		while(result.next()){
 			PaymentHistory paymentDetails = new PaymentHistory();
 			paymentDetails.setBill_id(result.getInt("bill_id"));
 			paymentDetails.setUser_name(result.getString("user_name"));
@@ -427,109 +444,123 @@ public class DBConnections {
 		}
 		closeConnection(dBConnection);
 		return PaymentHistory;
+		
 	}
-
-	public void createinvoice(HttpServletRequest request, String userId) throws ClassNotFoundException, SQLException {
+	
+	public void createinvoice(HttpServletRequest request,String userId) throws ClassNotFoundException, SQLException{
 		Connection dBConnection = createDbConnection();
-		// List<Invoice> invoice = new ArrayList<>();
+		List<Invoice> invoice = new ArrayList<>();
 		int bill_id = 0;
 		int amount_paid = Integer.parseInt(request.getParameter("amt").toString());
-
+		
 		String query0 = ("select max(bill_id) from invoice;");
 		Statement st0 = dBConnection.createStatement();
 		ResultSet rs0 = st0.executeQuery(query0);
-		if (rs0 != null && rs0.next())
+		if(rs0!=null && rs0.next())
 			bill_id = rs0.getInt(1) + 1;
 		else
-			bill_id = 1;
+			bill_id =  1;
 		String user_name = null;
 		Long card_used = 0L;
-
-		String query1 = ("select name from user where user_id = '" + userId + "';");
+		
+		String query1 = ("select name from user where user_id = '"+userId+"';");
 		ResultSet rs1 = st0.executeQuery(query1);
-		if (rs1.next()) {
+		if(rs1.next()){
 			user_name = rs1.getString("name");
 		}
-
-		String query2 = ("select card_number from card_details where user_id = '" + userId + "';");
+		
+		String query2 = ("select card_number from card_details where user_id = '"+userId+"';");
 		ResultSet rs2 = st0.executeQuery(query2);
-		if (rs2.next())
+		if(rs2.next())
 			card_used = rs2.getLong("card_number");
-
-		String createinvoice = ("insert into invoice (bill_id,user_id,user_name,card_used,amount_paid,status) values ("
-				+ bill_id + "," + userId + ",'" + user_name + "'," + card_used + "," + amount_paid + "," + "'Paid')");
+			
+		
+		String createinvoice = ("insert into invoice (bill_id,user_id,user_name,card_used,amount_paid,status) values ("+bill_id+","+userId+",'"+user_name+"',"+card_used+","+amount_paid+","+"'Paid')");
 		Statement st1 = dBConnection.createStatement();
 		st1.executeUpdate(createinvoice);
 		closeConnection(dBConnection);
+		
+		
 	}
-
-	public int totalcost(String userId) throws ClassNotFoundException, SQLException {
+	
+	public int totalcost(String userId) throws ClassNotFoundException, SQLException{
 		Connection dBConnection = createDbConnection();
 		int cost = 0;
-
-		String query0 = ("select session_cost from sensor_stat where sensor_id in (select sensor_id from user_sensor where user_id = '"
-				+ userId + "');");
+		Date today = new Date();
+		String query0 = ("select start_time,end_time,session_cost from sensor_stat where sensor_id in (select sensor_id from user_sensor where user_id = '" + userId+"');");
 		Statement st0 = dBConnection.createStatement();
 		ResultSet rs0 = st0.executeQuery(query0);
-
-		while (rs0.next())
-			cost = cost + rs0.getInt("session_cost");
-		closeConnection(dBConnection);
+		try{
+			while(rs0.next()){
+				if(rs0.getString("end_time")!=null && rs0.getString("end_time").length()!=0)
+					cost=cost+rs0.getInt("session_cost");
+				else
+					cost = cost + calculateSessionCost(rs0.getString("start_time"),today);
+			}
+			closeConnection(dBConnection);
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
 		return cost;
-
+		
 	}
-
-	public int amountpaid(String userId) throws ClassNotFoundException, SQLException {
+	
+	public int amountpaid(String userId) throws ClassNotFoundException, SQLException{
 		Connection dBConnection = createDbConnection();
 		int amt = 0;
-
-		String query0 = ("select amount_paid from invoice where user_id = '" + userId + "';");
+		
+		String query0 = ("select amount_paid from invoice where user_id = '" + userId+"';");
 		Statement st0 = dBConnection.createStatement();
 		ResultSet rs0 = st0.executeQuery(query0);
-
-		while (rs0.next())
-			amt = amt + rs0.getInt("amount_paid");
-		closeConnection(dBConnection);
+		
+			while(rs0.next())
+				amt=amt+rs0.getInt("amount_paid");
+		
+			closeConnection(dBConnection);
 		return amt;
-
+		
 	}
-
-	public List<Card_details> fetchCardDetails(String userId) throws ClassNotFoundException, SQLException {
+	
+	public List<Card_details> fetchCardDetails(String userId) throws ClassNotFoundException, SQLException{
 		Connection dBConnection = createDbConnection();
-
+		
 		List<Card_details> cardDetails = new ArrayList<>();
-		String query0 = ("select * from card_details where  user_id = '" + userId + "';");
+		String query0 = ("select * from card_details where  user_id = '" + userId+"';");
 		Statement st0 = dBConnection.createStatement();
 		ResultSet rs0 = st0.executeQuery(query0);
-
-		while (rs0.next()) {
+		
+		while(rs0.next())
+		{
 			Card_details card_Details = new Card_details();
 			card_Details.setCard_number(rs0.getLong("card_number"));
 			card_Details.setExp_date(rs0.getInt("exp_date"));
 			card_Details.setCvv(rs0.getInt("cvv"));
 			card_Details.setName_on_card(rs0.getString("name_on_card"));
 			cardDetails.add(card_Details);
-
+			
 		}
+			
+		
 		closeConnection(dBConnection);
 		return cardDetails;
+		
 	}
 
-	public List<Invoice> getinvoicedetails(String userId) throws ClassNotFoundException, SQLException {
+	public List<Invoice> getinvoicedetails(String userId) throws ClassNotFoundException, SQLException{
 		Connection dBConnection = createDbConnection();
 		List<Invoice> invoicedata = new ArrayList<>();
-		String query0 = ("select max(bill_id) from invoice where user_id = '" + userId + "';");
+		String query0 = ("select max(bill_id) from invoice where user_id = '" + userId+"';");
 		Statement st0 = dBConnection.createStatement();
 		ResultSet rs0 = st0.executeQuery(query0);
-
+		
 		int bill_id = 0;
-		if (rs0 != null && rs0.next())
+		if(rs0!=null && rs0.next())
 			bill_id = rs0.getInt(1);
-
-		String query1 = ("select bill_id,user_name, card_used,amount_paid,status from invoice where bill_id='" + bill_id
-				+ "' and user_id = '" + userId + "'");
+		
+		
+		String query1 = ("select bill_id,user_name, card_used,amount_paid,status from invoice where bill_id='"+bill_id +"' and user_id = '"+userId+"'");
 		ResultSet rs1 = st0.executeQuery(query1);
-		while (rs1.next()) {
+		while(rs1.next()){
 			Invoice invoice = new Invoice();
 			invoice.setBill_id(rs1.getInt("bill_id"));
 			invoice.setUser_name(rs1.getString("user_name"));
@@ -541,6 +572,6 @@ public class DBConnections {
 		closeConnection(dBConnection);
 		return invoicedata;
 	}
-
-	// Billing Module Ends
+	
+	//Billing Module Ends
 }
