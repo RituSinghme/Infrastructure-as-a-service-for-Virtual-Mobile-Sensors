@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.Iaas.Util.UtilConstants;
 import com.Iaas.Util.Utils;
 import com.Iaas.VO.SensorVO;
@@ -48,7 +50,7 @@ public class DBConnections {
 		return connection;
 	}
 
-	public void closeConnection(Connection connection) {
+	public static void closeConnection(Connection connection) {
 		if (connection != null)
 			try {
 				connection.close();
@@ -72,6 +74,7 @@ public class DBConnections {
 		ps.setString(6, weatherData.getWindDirection());
 		ps.setString(7, weatherData.getTimeStamp());
 		ps.executeUpdate();
+		closeConnection(dBConnection);
 	}
 
 	public void insertSensorData(SensorVO sensor) throws ClassNotFoundException, SQLException {
@@ -81,11 +84,13 @@ public class DBConnections {
 		ps.setString(1, sensor.getType());
 		ps.setString(2, sensor.getLocation());
 		ps.executeUpdate();
+		closeConnection(dBConnection);
 	}
 
 	public void insertUserSensorData(UserSensorVO userSensor) throws ClassNotFoundException, SQLException {
 		Connection dBConnection = createDbConnection();
-		String insertData = "insert into user_sensor" + "(user_id,sensor_id,location_id,status,start_time)" + " values" + "(?,?,?,?,?)";
+		String insertData = "insert into user_sensor" + "(user_id,sensor_id,location_id,status,start_time)" + " values"
+				+ "(?,?,?,?,?)";
 		PreparedStatement ps = dBConnection.prepareStatement(insertData);
 		ps.setString(1, userSensor.getUserId());
 		ps.setString(2, userSensor.getSensorId());
@@ -93,46 +98,53 @@ public class DBConnections {
 		ps.setString(4, userSensor.getStatusId());
 		ps.setString(5, userSensor.getStartTime());
 		ps.executeUpdate();
+		closeConnection(dBConnection);
 	}
-	
+
 	public int getLocationId(String location, String SensorType) throws ClassNotFoundException, SQLException {
 		int locationId = 0;
 		Connection dBConnection = createDbConnection();
 		Statement stmt = dBConnection.createStatement();
-		String query = "Select location_id from sensor where city="+'"'+location+'"'+" and type="+'"'+SensorType+'"'+";";
+		String query = "Select location_id from sensor where city=" + '"' + location + '"' + " and type=" + '"'
+				+ SensorType + '"' + ";";
 		ResultSet result = stmt.executeQuery(query);
-		while(result.next()){
+		while (result.next()) {
 			locationId = result.getInt("location_id");
 		}
+		closeConnection(dBConnection);
 		return locationId;
 	}
-	
-	public boolean checkLocation(String location, String SensorType) throws ClassNotFoundException, SQLException{
+
+	public boolean checkLocation(String location, String SensorType) throws ClassNotFoundException, SQLException {
 		Connection dBConnection = createDbConnection();
 		Statement stmt = dBConnection.createStatement();
-		String query = "Select location_id from sensor where city="+'"'+location+'"'+" and type="+'"'+SensorType+'"'+";";
+		String query = "Select location_id from sensor where city=" + '"' + location + '"' + " and type=" + '"'
+				+ SensorType + '"' + ";";
 		ResultSet result = stmt.executeQuery(query);
 		boolean dataExists = result.next();
+		closeConnection(dBConnection);
 		return dataExists;
 	}
-	
-	public List<UserSensorDeatailVO> getSensorDetails(String userId, String status) throws ClassNotFoundException, SQLException{
+
+	public List<UserSensorDeatailVO> getSensorDetails(String userId, String status)
+			throws ClassNotFoundException, SQLException {
 		Connection dBConnection = createDbConnection();
 		List<UserSensorDeatailVO> userSensorsList = new ArrayList<>();
 		Statement stmt = dBConnection.createStatement();
 		String query = null;
-		if(status.equals("all")){
-			query = "select sensor_id, type, city, status, start_time, end_time from sensor, user_sensor where sensor.location_id=user_sensor.location_id and user_id="+'"'+userId+'"'+";";
+		if (status.equals("all")) {
+			query = "select sensor_id, type, city, status, start_time, end_time from sensor, user_sensor where sensor.location_id=user_sensor.location_id and user_id="
+					+ '"' + userId + '"' + ";";
+		} else if (status.equals("running") || status.equals("stopped")) {
+			query = "select sensor_id, type, city, status, start_time, end_time from sensor, user_sensor where sensor.location_id=user_sensor.location_id and user_id="
+					+ '"' + userId + '"' + " and status =" + "'" + status + "'" + ";";
+		} else if (status.equals("terminated")) {
+			query = "select sensor_id, type, city, status, start_time, end_time from sensor, user_sensor where sensor.location_id=user_sensor.location_id and user_id="
+					+ '"' + userId + '"' + " and status !=" + "'" + status + "'" + ";";
 		}
-		else if(status.equals("running") || status.equals("stopped")) {
-			query = "select sensor_id, type, city, status, start_time, end_time from sensor, user_sensor where sensor.location_id=user_sensor.location_id and user_id="+'"'+userId+'"'+" and status ="+"'"+status+"'"+";";
-		}
-		else if(status.equals("terminated")){
-			query = "select sensor_id, type, city, status, start_time, end_time from sensor, user_sensor where sensor.location_id=user_sensor.location_id and user_id="+'"'+userId+'"'+" and status !="+"'"+status+"'"+";";
-		}
-		
+
 		ResultSet result = stmt.executeQuery(query);
-		while(result.next()){
+		while (result.next()) {
 			UserSensorDeatailVO sensorDeatailVO = new UserSensorDeatailVO();
 			sensorDeatailVO.setSensorId(result.getString("sensor_id"));
 			sensorDeatailVO.setSensorType(result.getString("type"));
@@ -142,6 +154,7 @@ public class DBConnections {
 			sensorDeatailVO.setEndTime(result.getString("end_time"));
 			userSensorsList.add(sensorDeatailVO);
 		}
+		closeConnection(dBConnection);
 		return userSensorsList;
 	}
 
@@ -157,20 +170,21 @@ public class DBConnections {
 		stmt.setString(3, null);
 		stmt.setString(4, sensorId);
 		stmt.executeUpdate();
-		
+
 		ViewSensorDetailsVO userStats = new ViewSensorDetailsVO();
 		userStats.setSensorId(sensorId);
 		userStats.setStartTime(timeStamp);
 		insertUserSensorStats(userStats);
+		closeConnection(dBConnection);
 	}
-	
+
 	public void updateStopStatus(String sensorId) throws ClassNotFoundException, SQLException, ParseException {
 		// TODO Auto-generated method stub
 		Utils util = new Utils();
 		String timeStamp = util.getCurrentTime();
 		Connection dBConnection = createDbConnection();
 		String insertDataStatus = "update user_sensor set status=? where sensor_id=? ;";
-		String insertDataEndTime = "update user_sensor set end_time=? where sensor_id=? ;" ;
+		String insertDataEndTime = "update user_sensor set end_time=? where sensor_id=? ;";
 		PreparedStatement stmt1 = dBConnection.prepareStatement(insertDataStatus);
 		stmt1.setString(1, "stopped");
 		stmt1.setString(2, sensorId);
@@ -179,10 +193,11 @@ public class DBConnections {
 		stmt2.setString(1, timeStamp);
 		stmt2.setString(2, sensorId);
 		stmt2.executeUpdate();
-		
+
 		updateEndTimeStats(sensorId, timeStamp);
+		closeConnection(dBConnection);
 	}
-	
+
 	public void updateTerminateStatus(String sensorId) throws ClassNotFoundException, SQLException, ParseException {
 		// TODO Auto-generated method stub
 		Utils util = new Utils();
@@ -194,29 +209,32 @@ public class DBConnections {
 		stmt.setString(2, timeStamp);
 		stmt.setString(3, sensorId);
 		stmt.executeUpdate();
-		
+
 		updateEndTimeStats(sensorId, timeStamp);
+		closeConnection(dBConnection);
 	}
-	
-	public String getUserId(String user) throws ClassNotFoundException, SQLException{
+
+	public String getUserId(String user) throws ClassNotFoundException, SQLException {
 		String userId = null;
 		Connection dBConnection = createDbConnection();
 		Statement stmt = dBConnection.createStatement();
-		String query = "Select user_id from user where email_id="+"'"+user+"'"+";";
+		String query = "Select user_id from user where email_id=" + "'" + user + "'" + ";";
 		ResultSet result = stmt.executeQuery(query);
-		while(result.next()){
+		while (result.next()) {
 			userId = result.getString("user_id");
 		}
+		closeConnection(dBConnection);
 		return userId;
 	}
-	
-	public List<ViewSensorDetailsVO> getUserSensorStats(String sensorId) throws ClassNotFoundException, SQLException{
+
+	public List<ViewSensorDetailsVO> getUserSensorStats(String sensorId) throws ClassNotFoundException, SQLException {
 		Connection dBConnection = createDbConnection();
 		List<ViewSensorDetailsVO> userStatsList = new ArrayList<>();
 		Statement stmtStartTime = dBConnection.createStatement();
-		String query = "Select sensor_id, start_time, end_time, session_cost from sensor_stat where sensor_id="+"'"+sensorId+"'"+";";
+		String query = "Select sensor_id, start_time, end_time, session_cost from sensor_stat where sensor_id=" + "'"
+				+ sensorId + "'" + ";";
 		ResultSet result = stmtStartTime.executeQuery(query);
-		while(result.next()){
+		while (result.next()) {
 			ViewSensorDetailsVO viewSensorDetailsVO = new ViewSensorDetailsVO();
 			viewSensorDetailsVO.setSensorId(result.getString("sensor_id"));
 			viewSensorDetailsVO.setStartTime(result.getString("start_time"));
@@ -224,19 +242,22 @@ public class DBConnections {
 			viewSensorDetailsVO.setCost(result.getString("session_cost"));
 			userStatsList.add(viewSensorDetailsVO);
 		}
+		closeConnection(dBConnection);
 		return userStatsList;
 	}
-	
-	public static void updateEndTimeStats(String sensorId, String endTime) throws ClassNotFoundException, SQLException, ParseException{
+
+	public static void updateEndTimeStats(String sensorId, String endTime)
+			throws ClassNotFoundException, SQLException, ParseException {
 		String startTime = null;
 		Connection dBConnection = createDbConnection();
 		Statement stmtStartTime = dBConnection.createStatement();
-		String query = "Select start_time from sensor_stat where sensor_id="+'"'+sensorId+'"'+" and end_time is null;";
+		String query = "Select start_time from sensor_stat where sensor_id=" + '"' + sensorId + '"'
+				+ " and end_time is null;";
 		ResultSet result = stmtStartTime.executeQuery(query);
-		while(result.next()){
+		while (result.next()) {
 			startTime = result.getString("start_time");
 		}
-		
+
 		String cost = calculateCost(startTime, endTime);
 		String insertData = "update sensor_stat set end_time=?, session_cost=? where sensor_id=?";
 		PreparedStatement stmt = dBConnection.prepareStatement(insertData);
@@ -244,40 +265,45 @@ public class DBConnections {
 		stmt.setString(2, cost);
 		stmt.setString(3, sensorId);
 		stmt.executeUpdate();
+		closeConnection(dBConnection);
 	}
-	
-	public static void insertUserSensorStats(ViewSensorDetailsVO userStats) throws ClassNotFoundException, SQLException {
+
+	public static void insertUserSensorStats(ViewSensorDetailsVO userStats)
+			throws ClassNotFoundException, SQLException {
 		Connection dBConnection = createDbConnection();
 		String insertData = "insert into sensor_stat" + "(sensor_id, start_time)" + " values" + "(?,?)";
 		PreparedStatement ps = dBConnection.prepareStatement(insertData);
 		ps.setString(1, userStats.getSensorId());
 		ps.setString(2, userStats.getStartTime());
 		ps.executeUpdate();
+		closeConnection(dBConnection);
 	}
-	
-	public static String calculateCost(String startTime, String endTime) throws ParseException{
-		long seconds = (convertStringToDate(endTime).getTime()-convertStringToDate(startTime).getTime())/1000;
-		double hours = seconds/3600;
-		double cost = (hours*UtilConstants.perHourUsage/1024)*UtilConstants.costPerGb + (hours*UtilConstants.costPerHour);
+
+	public static String calculateCost(String startTime, String endTime) throws ParseException {
+		long seconds = (convertStringToDate(endTime).getTime() - convertStringToDate(startTime).getTime()) / 1000;
+		double hours = seconds / 3600;
+		double cost = (hours * UtilConstants.perHourUsage / 1024) * UtilConstants.costPerGb
+				+ (hours * UtilConstants.costPerHour);
 		return Double.toString(cost);
 	}
-	
-	public static Date convertStringToDate(String date) throws ParseException{
+
+	public static Date convertStringToDate(String date) throws ParseException {
 		DateFormat formatter = new SimpleDateFormat("MM/dd/yy hh:mm a");
 		Date convertedDate = formatter.parse(date);
 		return convertedDate;
 	}
-	
-	//Billing Module -- @ Author Anushree
-	
-	public List<BillingDetails> getBillDetails(String userId) throws ClassNotFoundException, SQLException{
+
+	// Billing Module -- @ Author Anushree
+
+	public List<BillingDetails> getBillDetails(String userId) throws ClassNotFoundException, SQLException {
 		Connection dBConnection = createDbConnection();
 		List<BillingDetails> userBillList = new ArrayList<>();
 		Statement stmt = dBConnection.createStatement();
-		String query = ("select * from sensor_stat where sensor_id in (select sensor_id from user_sensor where user_id = '" + userId+"');");
+		String query = ("select * from sensor_stat where sensor_id in (select sensor_id from user_sensor where user_id = '"
+				+ userId + "');");
 		ResultSet result = stmt.executeQuery(query);
 		int total_cost = 0;
-		while(result.next()){
+		while (result.next()) {
 			BillingDetails billingDetails = new BillingDetails();
 			billingDetails.setSensor_id(result.getString("sensor_id"));
 			billingDetails.setStart_time(result.getString("start_time"));
@@ -286,16 +312,18 @@ public class DBConnections {
 			total_cost = total_cost + result.getInt("session_cost");
 			userBillList.add(billingDetails);
 		}
+		closeConnection(dBConnection);
 		return userBillList;
 	}
-	
-	public List<PaymentHistory> getPaymentHistory(String userId) throws ClassNotFoundException, SQLException{
+
+	public List<PaymentHistory> getPaymentHistory(String userId) throws ClassNotFoundException, SQLException {
 		Connection dBConnection = createDbConnection();
 		List<PaymentHistory> PaymentHistory = new ArrayList<>();
 		Statement stmt = dBConnection.createStatement();
-		String query = "select bill_id,user_name,billed_storage,billed_hours,card_used,amount_paid,status from invoice where user_id='"+ userId+"';";
+		String query = "select bill_id,user_name,billed_storage,billed_hours,card_used,amount_paid,status from invoice where user_id='"
+				+ userId + "';";
 		ResultSet result = stmt.executeQuery(query);
-		while(result.next()){
+		while (result.next()) {
 			PaymentHistory paymentDetails = new PaymentHistory();
 			paymentDetails.setBill_id(result.getInt("bill_id"));
 			paymentDetails.setUser_name(result.getString("user_name"));
@@ -306,116 +334,111 @@ public class DBConnections {
 			paymentDetails.setStatus(result.getString("status"));
 			PaymentHistory.add(paymentDetails);
 		}
+		closeConnection(dBConnection);
 		return PaymentHistory;
 	}
-	
-	public void createinvoice(HttpServletRequest request,String userId) throws ClassNotFoundException, SQLException{
+
+	public void createinvoice(HttpServletRequest request, String userId) throws ClassNotFoundException, SQLException {
 		Connection dBConnection = createDbConnection();
-		List<Invoice> invoice = new ArrayList<>();
+		// List<Invoice> invoice = new ArrayList<>();
 		int bill_id = 0;
 		int amount_paid = Integer.parseInt(request.getParameter("amt").toString());
-		
+
 		String query0 = ("select max(bill_id) from invoice;");
 		Statement st0 = dBConnection.createStatement();
 		ResultSet rs0 = st0.executeQuery(query0);
-		if(rs0!=null && rs0.next())
+		if (rs0 != null && rs0.next())
 			bill_id = rs0.getInt(1) + 1;
 		else
-			bill_id =  1;
+			bill_id = 1;
 		String user_name = null;
 		Long card_used = 0L;
-		
-		String query1 = ("select name from user where user_id = '"+userId+"';");
+
+		String query1 = ("select name from user where user_id = '" + userId + "';");
 		ResultSet rs1 = st0.executeQuery(query1);
-		if(rs1.next()){
+		if (rs1.next()) {
 			user_name = rs1.getString("name");
 		}
-		
-		String query2 = ("select card_number from card_details where user_id = '"+userId+"';");
+
+		String query2 = ("select card_number from card_details where user_id = '" + userId + "';");
 		ResultSet rs2 = st0.executeQuery(query2);
-		if(rs2.next())
+		if (rs2.next())
 			card_used = rs2.getLong("card_number");
-			
-		
-		String createinvoice = ("insert into invoice (bill_id,user_id,user_name,card_used,amount_paid,status) values ("+bill_id+","+userId+",'"+user_name+"',"+card_used+","+amount_paid+","+"'Paid')");
+
+		String createinvoice = ("insert into invoice (bill_id,user_id,user_name,card_used,amount_paid,status) values ("
+				+ bill_id + "," + userId + ",'" + user_name + "'," + card_used + "," + amount_paid + "," + "'Paid')");
 		Statement st1 = dBConnection.createStatement();
 		st1.executeUpdate(createinvoice);
-		
-		
+		closeConnection(dBConnection);
 	}
-	
-	public int totalcost(String userId) throws ClassNotFoundException, SQLException{
+
+	public int totalcost(String userId) throws ClassNotFoundException, SQLException {
 		Connection dBConnection = createDbConnection();
 		int cost = 0;
-		
-		String query0 = ("select session_cost from sensor_stat where sensor_id in (select sensor_id from user_sensor where user_id = '" + userId+"');");
+
+		String query0 = ("select session_cost from sensor_stat where sensor_id in (select sensor_id from user_sensor where user_id = '"
+				+ userId + "');");
 		Statement st0 = dBConnection.createStatement();
 		ResultSet rs0 = st0.executeQuery(query0);
-		
-			while(rs0.next())
-				cost=cost+rs0.getInt("session_cost");
-		
-			dBConnection.close();
+
+		while (rs0.next())
+			cost = cost + rs0.getInt("session_cost");
+		closeConnection(dBConnection);
 		return cost;
-		
+
 	}
-	
-	public int amountpaid(String userId) throws ClassNotFoundException, SQLException{
+
+	public int amountpaid(String userId) throws ClassNotFoundException, SQLException {
 		Connection dBConnection = createDbConnection();
 		int amt = 0;
-		
-		String query0 = ("select amount_paid from invoice where user_id = '" + userId+"';");
+
+		String query0 = ("select amount_paid from invoice where user_id = '" + userId + "';");
 		Statement st0 = dBConnection.createStatement();
 		ResultSet rs0 = st0.executeQuery(query0);
-		
-			while(rs0.next())
-				amt=amt+rs0.getInt("amount_paid");
-		
-		
+
+		while (rs0.next())
+			amt = amt + rs0.getInt("amount_paid");
+		closeConnection(dBConnection);
 		return amt;
-		
+
 	}
-	
-	public List<Card_details> fetchCardDetails(String userId) throws ClassNotFoundException, SQLException{
+
+	public List<Card_details> fetchCardDetails(String userId) throws ClassNotFoundException, SQLException {
 		Connection dBConnection = createDbConnection();
-		
+
 		List<Card_details> cardDetails = new ArrayList<>();
-		String query0 = ("select * from card_details where  user_id = '" + userId+"';");
+		String query0 = ("select * from card_details where  user_id = '" + userId + "';");
 		Statement st0 = dBConnection.createStatement();
 		ResultSet rs0 = st0.executeQuery(query0);
-		
-		while(rs0.next())
-		{
+
+		while (rs0.next()) {
 			Card_details card_Details = new Card_details();
 			card_Details.setCard_number(rs0.getLong("card_number"));
 			card_Details.setExp_date(rs0.getInt("exp_date"));
 			card_Details.setCvv(rs0.getInt("cvv"));
 			card_Details.setName_on_card(rs0.getString("name_on_card"));
 			cardDetails.add(card_Details);
-			
+
 		}
-			
-		
-		
+		closeConnection(dBConnection);
 		return cardDetails;
-		
 	}
 
-	public List<Invoice> getinvoicedetails(String userId) throws ClassNotFoundException, SQLException{
+	public List<Invoice> getinvoicedetails(String userId) throws ClassNotFoundException, SQLException {
 		Connection dBConnection = createDbConnection();
 		List<Invoice> invoicedata = new ArrayList<>();
-		String query0 = ("select max(bill_id) from invoice where user_id = '" + userId+"';");
+		String query0 = ("select max(bill_id) from invoice where user_id = '" + userId + "';");
 		Statement st0 = dBConnection.createStatement();
 		ResultSet rs0 = st0.executeQuery(query0);
-		
+
 		int bill_id = 0;
-		if(rs0!=null && rs0.next())
+		if (rs0 != null && rs0.next())
 			bill_id = rs0.getInt(1);
-		
-		
-		String query1 = ("select bill_id,user_name, card_used,amount_paid,status from invoice where bill_id='"+bill_id +"' and user_id = '"+userId+"'");
+
+		String query1 = ("select bill_id,user_name, card_used,amount_paid,status from invoice where bill_id='" + bill_id
+				+ "' and user_id = '" + userId + "'");
 		ResultSet rs1 = st0.executeQuery(query1);
-		while(rs1.next()){
+		while (rs1.next()) {
 			Invoice invoice = new Invoice();
 			invoice.setBill_id(rs1.getInt("bill_id"));
 			invoice.setUser_name(rs1.getString("user_name"));
@@ -424,8 +447,9 @@ public class DBConnections {
 			invoice.setStatus(rs1.getString("status"));
 			invoicedata.add(invoice);
 		}
+		closeConnection(dBConnection);
 		return invoicedata;
 	}
-	
-	//Billing Module Ends
+
+	// Billing Module Ends
 }
