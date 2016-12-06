@@ -23,7 +23,7 @@ div.container {
 
 
 header, footer {
-	color: white;
+	color: blue;
 	padding: 1em;
 	clear: left;
 	text-align: center;
