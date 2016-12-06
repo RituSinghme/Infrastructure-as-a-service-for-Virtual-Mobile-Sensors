@@ -108,6 +108,7 @@ public class DBOperations {
 		dbConn.fetchPlacesList();
 	}
 	
+	
 	// Billing Module @ Author -- Anushree
 	
 	public List<BillingDetails> viewBillDetails(String userId) throws ClassNotFoundException, SQLException{
