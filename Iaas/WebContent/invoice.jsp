@@ -94,7 +94,7 @@ td:last-child {
                 </div>
               
                  <span class="logout-spn" >
-                  <a href="#" style="color:#fff;">LOGOUT</a>  
+                  <a href="Login.jsp" style="color:#fff;">LOGOUT</a>  
 
                 </span>
             </div>
@@ -143,6 +143,7 @@ td:last-child {
     </tr>
   </thead>
   <tbody>
+  <h4 align="center">Payment Successful..!! Please find the Invoice below.</h4>
     <c:forEach items="${invoice}" var="bill"
 								varStatus="count">
 

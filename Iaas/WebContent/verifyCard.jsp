@@ -95,7 +95,7 @@ td:last-child {
                 </div>
               
                  <span class="logout-spn" >
-                  <a href="#" style="color:#fff;">LOGOUT</a>  
+                  <a href="Login.jsp" style="color:#fff;">LOGOUT</a>  
 
                 </span>
             </div>
@@ -126,7 +126,7 @@ td:last-child {
             <div id="page-inner">
                 <div class="row">
                     <div class="col-md-12">
-                     <h2>Card Details</h2>   
+                     <h2>Verify Card Details</h2>   
                     </div>
                 </div>              
                  <!-- /. ROW  -->
@@ -142,6 +142,7 @@ td:last-child {
      
     
     </tr>
+   
   </thead>
   <tbody>
     <c:forEach items="${card_details}" var="details"
@@ -157,12 +158,13 @@ td:last-child {
 									
 								</tr>
 							</c:forEach>
-							
+				 		
 							
 		
    
   </tbody>
 </table>
+<h4 align="center">Your card will be charged  - <% out.print(request.getParameter("amt"));%>. Please click on 'Pay' to proceed</h4>
 
 				<div class="row text-center pad-top">
 				<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"></div>

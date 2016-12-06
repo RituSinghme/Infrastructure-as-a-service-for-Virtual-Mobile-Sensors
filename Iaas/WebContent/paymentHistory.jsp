@@ -94,7 +94,7 @@ td:last-child {
                 </div>
               
                  <span class="logout-spn" >
-                  <a href="#" style="color:#fff;">LOGOUT</a>  
+                  <a href="Login.jsp" style="color:#fff;">LOGOUT</a>  
 
                 </span>
             </div>
