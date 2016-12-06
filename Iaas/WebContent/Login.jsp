@@ -21,12 +21,8 @@ div.container {
 	padding: 50px;
 }
 
-body {
-	background-color: powderblue;
-}
 
 header, footer {
-	background-color: blue;
 	color: white;
 	padding: 1em;
 	clear: left;
