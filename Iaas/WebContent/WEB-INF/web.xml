@@ -60,4 +60,7 @@
 		<servlet-name>terminateSensor</servlet-name>
 		<url-pattern>/terminateSensor</url-pattern>
 	</servlet-mapping>
+	<listener>
+		<listener-class>com.Iaas.Util.Listener</listener-class>
+	</listener>
 </web-app>

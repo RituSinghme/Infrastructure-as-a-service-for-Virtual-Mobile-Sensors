@@ -23,7 +23,7 @@ import com.Iaas.dbConnections.DBConnections;
  *
  */
 public class SensorData {
-	public void fetchData(String url) throws IOException, JSONException, ClassNotFoundException, SQLException {
+	public void fetchData(String url, String city) throws IOException, JSONException, ClassNotFoundException, SQLException {
 		WeatherDataVO weatherData = new WeatherDataVO();
 		InputStream is = new URL(url).openStream();
 		try {
@@ -31,6 +31,9 @@ public class SensorData {
 			String jsonText = readAll(rd);
 			JSONObject json = new JSONObject(jsonText);
 			Utils util = new Utils();
+			DBConnections dbconn = new DBConnections();
+			int locationIId = dbconn.getLocationId(city);
+			weatherData.setLocationId(locationIId);
 			weatherData.setTemp(json.getJSONObject("main").getString("temp"));
 			weatherData.setMax_temp(json.getJSONObject("main").getString("temp_max"));
 			weatherData.setMin_temp(json.getJSONObject("main").getString("temp_min"));

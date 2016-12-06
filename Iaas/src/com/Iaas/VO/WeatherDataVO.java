@@ -8,6 +8,7 @@ package com.Iaas.VO;
  *
  */
 public class WeatherDataVO {
+	private int locationId;
 	private String temp;
 	private String min_temp;
 	private String max_temp;
@@ -17,6 +18,12 @@ public class WeatherDataVO {
 	private String windSpeed;
 	private String windDirection;
 	private String timeStamp;
+	public int getLocationId() {
+		return locationId;
+	}
+	public void setLocationId(int locationId) {
+		this.locationId = locationId;
+	}
 	public String getTemp() {
 		return temp;
 	}

@@ -95,6 +95,19 @@ public class DBOperations {
 		return userSensorStats;
 	}
 	
+	public void addSensorsToList(String userId) throws ClassNotFoundException, SQLException{
+		DBConnections dbconn = new DBConnections();
+		dbconn.getPressureSensors(userId);
+		dbconn.getTempSensors(userId);
+		dbconn.getHumidSensors(userId);
+		dbconn.getWindSensors(userId);
+	}
+	
+	public void getLocationsList() throws ClassNotFoundException, SQLException{
+		DBConnections dbConn = new DBConnections();
+		dbConn.fetchPlacesList();
+	}
+	
 	// Billing Module @ Author -- Anushree
 	
 	public List<BillingDetails> viewBillDetails(String userId) throws ClassNotFoundException, SQLException{

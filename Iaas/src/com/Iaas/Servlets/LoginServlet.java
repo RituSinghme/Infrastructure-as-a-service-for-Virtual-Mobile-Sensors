@@ -33,6 +33,9 @@ public class LoginServlet extends HttpServlet {
 			String action = request.getParameter("action");
 			if (action.equals("Submit")) {
 				if (name.equals("rahul@gmail.com") && password.equals("rahul")) {
+					String userId = dboper.getUserId(name);
+					UtilConstants.setUserId(userId);
+					dboper.addSensorsToList(userId);
 					RequestDispatcher rd = request.getRequestDispatcher("userDashBoard.jsp");
 					rd.forward(request, response);
 				} else {
@@ -43,13 +46,9 @@ public class LoginServlet extends HttpServlet {
 				RequestDispatcher rd = request.getRequestDispatcher("register.jsp");
 				rd.forward(request, response);
 			}
-			String userId = dboper.getUserId(name);
-			UtilConstants.setUserId(userId);
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

@@ -8,6 +8,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -56,5 +58,28 @@ public class Utils {
         SimpleDateFormat sdf = new SimpleDateFormat();
         String timeStamp = sdf.format(calendar.getTime());
 		return timeStamp;
+	}
+	
+	public void startFetchingData(){
+		TimerTask task = new TimerTask() {
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				for(String city : UtilConstants.getCitiesList()){
+					Utils util = new Utils();
+					try {
+						System.out.println(city);
+						String[] latlng=util.getLatLongPositions(city);
+						SensorData data = new SensorData();
+						data.fetchData(UtilConstants.weatherURLLat+latlng[0]+UtilConstants.weatherURLLong+latlng[1]+
+								UtilConstants.weatherURLAppID, city);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(task, 0, 3600000);
 	}
 }

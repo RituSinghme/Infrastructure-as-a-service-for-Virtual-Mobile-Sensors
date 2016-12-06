@@ -20,15 +20,16 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.Iaas.Util.UtilConstants;
 import com.Iaas.Util.Utils;
+import com.Iaas.VO.BillingDetails;
+import com.Iaas.VO.Card_details;
+import com.Iaas.VO.Invoice;
+import com.Iaas.VO.PaymentHistory;
+import com.Iaas.VO.SensorTypeVO;
 import com.Iaas.VO.SensorVO;
 import com.Iaas.VO.UserSensorDeatailVO;
 import com.Iaas.VO.UserSensorVO;
 import com.Iaas.VO.ViewSensorDetailsVO;
 import com.Iaas.VO.WeatherDataVO;
-import com.Iaas.VO.BillingDetails;
-import com.Iaas.VO.Card_details;
-import com.Iaas.VO.Invoice;
-import com.Iaas.VO.PaymentHistory;
 
 /**
  * @author Rahul
@@ -64,15 +65,16 @@ public class DBConnections {
 		Connection dBConnection = createDbConnection();
 		String insertData = "insert into sensor_data "
 				+ "(location_id, pressure, temp_min, temp_max, humidity, wind_speed, wind_degree, last_update_time)"
-				+ " values" + "(1,?,?,?,?,?,?,?)";
+				+ " values" + "(?,?,?,?,?,?,?,?)";
 		PreparedStatement ps = dBConnection.prepareStatement(insertData);
-		ps.setString(1, weatherData.getPressure());
-		ps.setString(2, weatherData.getMin_temp());
-		ps.setString(3, weatherData.getMax_temp());
-		ps.setString(4, weatherData.getHumidity());
-		ps.setString(5, weatherData.getWindSpeed());
-		ps.setString(6, weatherData.getWindDirection());
-		ps.setString(7, weatherData.getTimeStamp());
+		ps.setInt(1, weatherData.getLocationId());
+		ps.setString(2, weatherData.getPressure());
+		ps.setString(3, weatherData.getMin_temp());
+		ps.setString(4, weatherData.getMax_temp());
+		ps.setString(5, weatherData.getHumidity());
+		ps.setString(6, weatherData.getWindSpeed());
+		ps.setString(7, weatherData.getWindDirection());
+		ps.setString(8, weatherData.getTimeStamp());
 		ps.executeUpdate();
 		closeConnection(dBConnection);
 	}
@@ -107,6 +109,19 @@ public class DBConnections {
 		Statement stmt = dBConnection.createStatement();
 		String query = "Select location_id from sensor where city=" + '"' + location + '"' + " and type=" + '"'
 				+ SensorType + '"' + ";";
+		ResultSet result = stmt.executeQuery(query);
+		while (result.next()) {
+			locationId = result.getInt("location_id");
+		}
+		closeConnection(dBConnection);
+		return locationId;
+	}
+
+	public int getLocationId(String location) throws ClassNotFoundException, SQLException {
+		int locationId = 0;
+		Connection dBConnection = createDbConnection();
+		Statement stmt = dBConnection.createStatement();
+		String query = "Select location_id from sensor where city=" + '"' + location + '"'+";";
 		ResultSet result = stmt.executeQuery(query);
 		while (result.next()) {
 			locationId = result.getInt("location_id");
@@ -293,6 +308,82 @@ public class DBConnections {
 		return convertedDate;
 	}
 
+	public void getPressureSensors(String userId) throws ClassNotFoundException, SQLException {
+		String type = "Pressure";
+		Connection dBConnection = createDbConnection();
+		Statement stmt = dBConnection.createStatement();
+		String query = "select user_id, sensor_id, type from user_sensor join sensor on user_sensor.location_id=sensor.location_id where user_id="+Integer.parseInt(userId)+"and type="+"'"+type+"'"+";";
+		ResultSet result = stmt.executeQuery(query);
+		while (result.next()) {
+			SensorTypeVO sensor = new SensorTypeVO();
+			sensor.setUserId(result.getInt("user_id"));
+			sensor.setSensorId(result.getString("sensor_id"));
+			sensor.setType(result.getString("type"));
+			UtilConstants.getPressureSensorsList().add(sensor);
+		}
+		closeConnection(dBConnection);
+	}
+
+	public void getTempSensors(String userId) throws ClassNotFoundException, SQLException {
+		String type = "Temperature";
+		Connection dBConnection = createDbConnection();
+		Statement stmt = dBConnection.createStatement();
+		String query = "select user_id, sensor_id, type from user_sensor join sensor on user_sensor.location_id=sensor.location_id where user_id="+Integer.parseInt(userId)+"and type="+"'"+type+"'"+";";
+		ResultSet result = stmt.executeQuery(query);
+		while (result.next()) {
+			SensorTypeVO sensor = new SensorTypeVO();
+			sensor.setUserId(result.getInt("user_id"));
+			sensor.setSensorId(result.getString("sensor_id"));
+			sensor.setType(result.getString("type"));
+			UtilConstants.getTemperatureSensorsList().add(sensor);
+		}
+		closeConnection(dBConnection);
+	}
+
+	public void getHumidSensors(String userId) throws ClassNotFoundException, SQLException {
+		String type = "Wind";
+		Connection dBConnection = createDbConnection();
+		Statement stmt = dBConnection.createStatement();
+		String query = "select user_id, sensor_id, type from user_sensor join sensor on user_sensor.location_id=sensor.location_id where user_id="+Integer.parseInt(userId)+"and type="+"'"+type+"'"+";";
+		ResultSet result = stmt.executeQuery(query);
+		while (result.next()) {
+			SensorTypeVO sensor = new SensorTypeVO();
+			sensor.setUserId(result.getInt("user_id"));
+			sensor.setSensorId(result.getString("sensor_id"));
+			sensor.setType(result.getString("type"));
+			UtilConstants.getWindSensorsList().add(sensor);
+		}
+		closeConnection(dBConnection);
+	}
+
+	public void getWindSensors(String userId) throws ClassNotFoundException, SQLException {
+		String type = "Humidity";
+		Connection dBConnection = createDbConnection();
+		Statement stmt = dBConnection.createStatement();
+		String query = "select user_id, sensor_id, type from user_sensor join sensor on user_sensor.location_id=sensor.location_id where user_id="+Integer.parseInt(userId)+"and type="+"'"+type+"'"+";";
+		ResultSet result = stmt.executeQuery(query);
+		while (result.next()) {
+			SensorTypeVO sensor = new SensorTypeVO();
+			sensor.setUserId(result.getInt("user_id"));
+			sensor.setSensorId(result.getString("sensor_id"));
+			sensor.setType(result.getString("type"));
+			UtilConstants.getPressureSensorsList().add(sensor);
+		}
+		closeConnection(dBConnection);
+	}
+	
+	public void fetchPlacesList() throws ClassNotFoundException, SQLException{
+		Connection dBConnection = createDbConnection();
+		Statement stmt = dBConnection.createStatement();
+		String query = "select city from sensor;";
+		List<String> cityList = new ArrayList<>();
+		ResultSet result = stmt.executeQuery(query);
+		while (result.next()) {
+			cityList.add(result.getString("city"));
+		}
+		UtilConstants.setCitiesList(cityList);
+		closeConnection(dBConnection);
+	}
 	// Billing Module -- @ Author Anushree
 
 	public List<BillingDetails> getBillDetails(String userId) throws ClassNotFoundException, SQLException {
