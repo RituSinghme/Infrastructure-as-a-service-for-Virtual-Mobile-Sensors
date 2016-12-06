@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.Iaas.VO.Card_details;
 import com.Iaas.VO.Invoice;
 import com.Iaas.dbConnections.DBOperations;
+import com.Iaas.Util.*;
 
 /**
  * Servlet implementation class Payment
@@ -35,8 +36,8 @@ public class PaymentServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//String total_cost = request.getAttribute("total_amount_due").toString();
-		String userId = "1";
+		UtilConstants util = new UtilConstants();
+		String userId = util.getUserId();
 		DBOperations dbOperations = new DBOperations();
 		try{
 		  if (request.getParameter("status") != null && request.getParameter("status").equals("cardDetails") && request.getParameter("amt") != null ){
