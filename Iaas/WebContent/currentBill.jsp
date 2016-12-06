@@ -173,13 +173,16 @@ td:last-child {
 							</a>
 						</div>
 						</div>
+						<%if(Integer.parseInt(request.getAttribute("total_amount_due").toString())!=0){ %>
 						<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6">
+						
 						<div class="div-square">
 							<a href="<%=request.getContextPath()%>/payment?status=cardDetails&amt=<%out.print(request.getAttribute("total_amount_due"));%>">
 								<h4>Pay Now</h4>
 							</a>
 						</div>
-					</div>
+						
+					</div><%} %>
 				</div>
 				
 				
