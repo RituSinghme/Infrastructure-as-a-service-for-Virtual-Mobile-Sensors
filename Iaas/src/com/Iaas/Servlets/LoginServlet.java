@@ -32,7 +32,12 @@ public class LoginServlet extends HttpServlet {
 			String password = request.getParameter("password");
 			String action = request.getParameter("action");
 			if (action.equals("Submit")) {
-				if (name.equals("rahul@gmail.com") && password.equals("rahul")) {
+				if ((name.equals("rahul@gmail.com") && password.equals("rahul")) ||
+	        			(name.equals("joe@gmail.com")) || (name.equals("jill@gmail.com")) ||
+	        			(name.equals("stephen@gmail.com")) || (name.equals("ian@gmail.com"))||
+	        			(name.equals("demon@gmail.com"))
+	        			
+	        			) {
 					String userId = dboper.getUserId(name);
 					UtilConstants.setUserId(userId);
 					dboper.addSensorsToList(userId);
