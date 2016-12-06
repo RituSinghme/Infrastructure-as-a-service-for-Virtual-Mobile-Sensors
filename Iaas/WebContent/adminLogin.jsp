@@ -14,10 +14,9 @@
     border:50px;
     padding:50px;
      }
-   body {background-color: powderblue;}
+
    header, footer {
-   background-color: blue;
-   color:white;
+   color:blue;
    padding:1em;
    clear:left;
    text-align:center;
