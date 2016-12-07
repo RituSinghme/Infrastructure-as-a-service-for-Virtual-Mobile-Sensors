@@ -40,7 +40,7 @@ public class LoginServlet extends HttpServlet {
 	        			) {
 					String userId = dboper.getUserId(name);
 					UtilConstants.setUserId(userId);
-					dboper.addSensorsToList(userId);
+					//dboper.addSensorsToList(userId);
 					RequestDispatcher rd = request.getRequestDispatcher("userDashBoard.jsp");
 					rd.forward(request, response);
 				} else {
