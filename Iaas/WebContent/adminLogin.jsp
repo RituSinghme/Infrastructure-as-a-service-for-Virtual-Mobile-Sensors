@@ -49,10 +49,10 @@
                     </a>
                 </div>
               
-                 <span class="logout-spn" >
+                 <!-- <span class="logout-spn" >
                   <a href="Login.jsp" style="color:#fff;">LOGOUT</a>  
 
-                </span>
+                </span> -->
             </div>
         </div>
 
