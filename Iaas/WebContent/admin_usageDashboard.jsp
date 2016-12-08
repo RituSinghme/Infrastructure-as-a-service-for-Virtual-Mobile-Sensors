@@ -7,7 +7,7 @@
 
 <!DOCTYPE html>
 
-<html ng-app="AngularChartExample">
+<html>
 <head>
   <title>Admin Dashboard</title>
   <meta charset="utf-8">
