@@ -3,7 +3,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang='en'>
 <head>
-<title>Bootstrap Example</title>
+<title>Login</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet"
@@ -14,6 +14,16 @@
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+	
+	<!-- BOOTSTRAP STYLES-->
+    <link href="assets/css/bootstrap.css" rel="stylesheet" />
+     <!-- FONTAWESOME STYLES-->
+    <link href="assets/css/font-awesome.css" rel="stylesheet" />
+        <!-- CUSTOM STYLES-->
+    <link href="assets/css/custom.css" rel="stylesheet" />
+     <!-- GOOGLE FONTS-->
+   <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+	
 <style>
 div.container {
 	width: 50%;
@@ -31,6 +41,28 @@ header, footer {
 </style>
 </head>
 <body>
+
+    <div id="wrapper">
+         <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="adjust-nav">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">
+                        <img src="assets/img/logo.png" />
+                    </a>
+                </div>
+              
+                 <span class="logout-spn" >
+                  <a href="Login.jsp" style="color:#fff;">LOGOUT</a>  
+
+                </span>
+            </div>
+        </div>
+
 	<div class="container">
 		<h2>User login</h2>
 		<br>
@@ -50,8 +82,18 @@ header, footer {
 			</div>
 			<input type="submit" name="action" class="btn btn-primary" value="Submit">
 			<input type="submit" name="action" class="btn btn-primary" value="Register">
-			<h4><a  href="adminLogin.jsp">Admin Login</a></h4>
+			
+			<!-- - <h4><a  href="adminLogin.jsp">Admin Login</a></h4> -->
+			
+			<br><br>
+			<div class="btn-group btn-group-justified">
+            <a href="adminLogin.jsp" class="btn btn-info">Admin Login</a>
+            </div>
+			
 		</form>
+	</div>
+	</div> <br>
+		<div class="footer">
 	</div>
 </body>
 </html>
