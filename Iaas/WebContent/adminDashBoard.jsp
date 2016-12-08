@@ -47,10 +47,10 @@
                     </li>
                    
 
-                    <li>
+                  <!--  <li>
                         <a href="viewProfile.jsp"><i class="fa fa-table "></i>View My Profile</a>
                     </li>
-                   <!-- <li class="active-link">
+                    <li class="active-link">
                         <a href="adminDashBoard.jsp"><i class="fa fa-edit "></i>Edit Profile</a>
                     </li> -->
 				</ul>
