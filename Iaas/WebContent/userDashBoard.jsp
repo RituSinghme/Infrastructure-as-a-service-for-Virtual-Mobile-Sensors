@@ -48,7 +48,7 @@
                    
 
                     <li>
-                        <a href="userDashBoard.jsp"><i class="fa fa-table "></i>View My Profile</a>
+                        <a href="viewProfile.jsp"><i class="fa fa-table "></i>View My Profile</a>
                     </li>
                   <!--  <li class="active-link">
                         <a href="userDashBoard.jsp"><i class="fa fa-edit "></i>Edit Profile</a>
