@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.Iaas.Util.UtilConstants;
 import com.Iaas.dbConnections.DBOperations;
@@ -31,6 +32,7 @@ public class LoginServlet extends HttpServlet {
 			String name = request.getParameter("name");
 			String password = request.getParameter("password");
 			String action = request.getParameter("action");
+			HttpSession session = request.getSession();
 			if (action.equals("Submit")) {
 				if ((name.equals("rahul@gmail.com") && password.equals("rahul")) ||
 	        			(name.equals("joe@gmail.com")) || (name.equals("jill@gmail.com")) ||
@@ -47,6 +49,10 @@ public class LoginServlet extends HttpServlet {
 					RequestDispatcher rd = request.getRequestDispatcher("Login.jsp");
 					rd.forward(request, response);
 				}
+				
+				session.setAttribute("userId", UtilConstants.getUserId());
+				/////
+				
 			} else if (action.equals("Register")) {
 				RequestDispatcher rd = request.getRequestDispatcher("register.jsp");
 				rd.forward(request, response);
