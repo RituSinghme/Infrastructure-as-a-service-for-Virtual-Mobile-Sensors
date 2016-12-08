@@ -120,7 +120,7 @@ table, th , td {
                    
 
                     <li>
-                        <a href="userDashBoard.jsp"><i class="fa fa-table "></i>View My Profile</a>
+                        <a href="viewProfile.jsp"><i class="fa fa-table "></i>View My Profile</a>
                     </li>
                     <li>
                         <a href="userDashBoard.jsp"><i class="table "></i></a>
