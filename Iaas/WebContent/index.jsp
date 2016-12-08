@@ -63,11 +63,11 @@ a:active  {color:yellow; background-color:transparent; text-decoration:underline
     </div>
     <div class="col-sm-3">
       <h3><a href ="adminLogin.jsp">Admin Login</a></h3>
-      <p>Link for Admin group</p>
+      <p>For Admin group login</p>
     </div>
     <div class="col-sm-4">
       <h3><a href ="Login.jsp">User Login</a></h3>
-      <p>For User login or signup, click here</p>
+      <p>For User login or signup </p>
     </div>
   </div>
 </div><br><br><br><br><br><br><br>
