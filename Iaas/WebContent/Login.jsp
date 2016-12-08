@@ -90,7 +90,7 @@ header, footer {
 			<br>
 			<div class="btn-group ">
 			<input type="submit" name="action" class="btn btn-primary" value="Submit">
-			<a href="register.jsp" class="btn btn-primary">Admin Login</a>
+			<a href="register.jsp" class="btn btn-primary">Register</a>
             <a href="adminLogin.jsp" class="btn btn-primary">Admin Login</a>
             </div>
 			
