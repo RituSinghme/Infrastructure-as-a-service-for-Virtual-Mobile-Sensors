@@ -122,8 +122,8 @@ table, th , td {
                     <li>
                         <a href="userDashBoard.jsp"><i class="fa fa-table "></i>View My Profile</a>
                     </li>
-                    <li class="active-link">
-                        <a href="userDashBoard.jsp"><i class="fa fa-edit "></i>Edit Profile</a>
+                    <li>
+                        <a href="userDashBoard.jsp"><i class="fa fa-table "></i>Edit My Profile</a>
                     </li>
 				</ul>
 			</div>
@@ -427,7 +427,12 @@ var myPieChart = new Chart(ctx, {
                     "#6666ff",
                     "#808000",
                     "#e60073",
-                    "#00cc00"
+                    "#00cc00",
+                    "#ff8533",
+                    "#e600e6",
+                    "#00ff00",
+                    "#999900",
+                    "#33ccff"
                 ],
                 hoverBackgroundColor: [
                     "#b30027",
@@ -437,7 +442,12 @@ var myPieChart = new Chart(ctx, {
                     "#0000b3",
                     "#333300",
                     "#660033",
-                    "#004d00"
+                    "#004d00",
+                    "#993d00",
+                    "#800080",
+                    "#006600",
+                    "#666600",
+                    "#007399"
                 ]
             }]
     },
@@ -501,6 +511,7 @@ var myChart = new Chart(ctx, {
             borderColor: [
                 'rgba(232,99,132,1)'
             ],
+            hoverBackgroundColor: "#b30027",
             
             borderWidth: 5
         }]
@@ -592,8 +603,8 @@ else out.println(pc.next()); %>
     
     <%
       int total=0;
-      tbl = tb.executeQuery("select sensor_id, type, city, status, start_time, ifnull(end_time, ' ') as end_time, ifnull(weather,' ') as weather , ifnull(pressure, ' ') as pressure, ifnull(temp_min, '') as temp_min, ifnull(temp_max,'') as temp_max , ifnull(humidity,'') as humidity, ifnull(wind_speed,'')  as wind_speed, ifnull(wind_degree,'') as wind_degree from sensor s join user_sensor u  on s.location_id = u.location_id join sensor_data d on s.location_id = d.location_id  ;");
-      tblc = tbc.executeQuery("select count(*) as total from user_sensor u join sensor s on u.location_id = s.location_id join sensor_data d on s.location_id = d.location_id ;");
+      tbl = tb.executeQuery("select distinct sensor_id, start_time, name, us.user_id, type, city, status, ifnull(end_time, ' ') as end_time, ifnull(weather,' ') as weather , ifnull(pressure, ' ') as pressure, ifnull(temp_min, '') as temp_min, ifnull(temp_max,'') as temp_max , ifnull(humidity,'') as humidity, ifnull(wind_speed,'')  as wind_speed, ifnull(wind_degree,'') as wind_degree from user_sensor u  join user us on (u.user_id = us.user_id) join  sensor s on (u.location_id = s.location_id)  left join sensor_data d on s.location_id = d.location_id group by sensor_id, start_time order by name;");   
+      tblc = tbc.executeQuery("select count(distinct sensor_id, start_time) as total from user_sensor u join  sensor s on (u.location_id = s.location_id) left join sensor_data d on s.location_id = d.location_id "); 
       if (tblc.next()){total =tblc.getInt("Total");}
       if (total != 0){ %>
     
@@ -602,19 +613,21 @@ else out.println(pc.next()); %>
 			<table border="1" cellpadding="5">
 	            <caption><h2>Total Instances Created :<%out.print(tblc.getString("total")); %></h2></caption>
 	            <tr>
-	            	<th>Sensor_id</th>
+	                <th>User Id</th>
+	                <th>User Name</th>
+	            	<th>Sensor Id</th>
 	                <th>Type</th>
 	                <th>City</th>
 	                <th>Status</th>
 	                <th>Start Time</th>
 	                <th>End Time</th>
-	                <th>Weather</th>
+	           <!-- <th>Weather</th>   
 	                <th>Pressure</th>
 	                <th>Min Temp</th>
 	                <th>Max Temp</th>
 	                <th>humidity</th>
 	                <th>Wind Speed</th>
-	                <th>Wind Degree</th>
+	                <th>Wind Degree</th> -->
 	            </tr>
 	        <%    
 			while(tbl.next())
@@ -622,19 +635,21 @@ else out.println(pc.next()); %>
 					
 			%>
 			    <tr align = "center">
+			        <td><% out.print(tbl.getString("user_id")); %></td>
+			        <td><% out.print(tbl.getString("name")); %></td>
 	                <td><% out.print(tbl.getString("sensor_id")); %></td>
 	                <td><% out.print(tbl.getString("type")); %></td>
 	                <td><% out.print(tbl.getString("city")); %></td>
 	                <td><% out.print(tbl.getString("status")); %></td>
 	                <td><% out.print(tbl.getString("start_time")); %></td>
 	                <td><% out.print(tbl.getString("end_time")); %></td>
-	                <td><% out.print(tbl.getString("weather")); %></td>
+	          <!--  <td><% out.print(tbl.getString("weather")); %></td>    
 	                <td><% out.print(tbl.getString("pressure")); %></td>
 	                <td><% out.print(tbl.getString("temp_min")); %></td>
 	                <td><% out.print(tbl.getString("temp_max")); %></td>
 	                <td><% out.print(tbl.getString("humidity")); %></td>
 	                <td><% out.print(tbl.getString("wind_speed")); %></td>
-	                <td><% out.print(tbl.getString("wind_degree")); %></td>
+	                <td><% out.print(tbl.getString("wind_degree")); %></td> -->
 	             </tr>
 	            <% } 
 	            
