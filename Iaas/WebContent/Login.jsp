@@ -80,20 +80,23 @@ header, footer {
 			<div class="checkbox">
 				<label><input type="checkbox"> Remember me</label>
 			</div>
-			<input type="submit" name="action" class="btn btn-primary" value="Submit">
+			
+			
+			<!-- - <input type="submit" name="action" class="btn btn-primary" value="Submit">
 			<input type="submit" name="action" class="btn btn-primary" value="Register">
 			
-			<!-- - <h4><a  href="adminLogin.jsp">Admin Login</a></h4> -->
+			<h4><a  href="adminLogin.jsp">Admin Login</a></h4> -->
 			
-			<br><br>
-			<div class="btn-group btn-group-justified">
-            <a href="adminLogin.jsp" class="btn btn-info">Admin Login</a>
+			<br>
+			<div class="btn-group ">
+			<input type="submit" name="action" class="btn btn-primary" value="Submit">
+			<input type="submit" name="action" class="btn btn-primary" value="Register">
+            <a href="adminLogin.jsp" class="btn btn-primary">Admin Login</a>
             </div>
 			
 		</form>
 	</div>
 	</div> <br>
-		<div class="footer">
-	</div>
+
 </body>
 </html>
