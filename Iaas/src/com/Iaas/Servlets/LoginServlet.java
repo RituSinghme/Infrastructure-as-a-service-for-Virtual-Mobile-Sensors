@@ -51,7 +51,6 @@ public class LoginServlet extends HttpServlet {
 				}
 				
 				session.setAttribute("userId", UtilConstants.getUserId());
-				/////
 				
 			} else if (action.equals("Register")) {
 				RequestDispatcher rd = request.getRequestDispatcher("register.jsp");
