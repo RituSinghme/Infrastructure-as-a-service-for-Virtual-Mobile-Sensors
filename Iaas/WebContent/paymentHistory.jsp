@@ -125,7 +125,7 @@ td:last-child {
             <div id="page-inner">
                 <div class="row">
                     <div class="col-md-12">
-                     <h2>View Sensors </h2>   
+                     <h2>Payment History</h2>   
                     </div>
                 </div>              
                  <!-- /. ROW  -->
