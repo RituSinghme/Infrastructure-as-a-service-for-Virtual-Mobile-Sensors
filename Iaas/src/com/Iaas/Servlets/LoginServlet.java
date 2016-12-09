@@ -4,7 +4,10 @@
 package com.Iaas.Servlets;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -14,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.Iaas.Util.UtilConstants;
+import com.Iaas.dbConnections.DBConnections;
 import com.Iaas.dbConnections.DBOperations;
 
 /**
@@ -31,31 +35,51 @@ public class LoginServlet extends HttpServlet {
 			DBOperations dboper = new DBOperations();
 			String name = request.getParameter("name");
 			String password = request.getParameter("password");
-			String action = request.getParameter("action");
+			String action1 = request.getParameter("action1");
+			String action2 = request.getParameter("action2");
 			HttpSession session = request.getSession();
-			if (action.equals("Submit")) {
-				if ((name.equals("rahul@gmail.com") && password.equals("rahul")) ||
-	        			(name.equals("joe@gmail.com")) || (name.equals("jill@gmail.com")) ||
-	        			(name.equals("stephen@gmail.com")) || (name.equals("ian@gmail.com"))||
-	        			(name.equals("demon@gmail.com"))
-	        			
-	        			) {
-					String userId = dboper.getUserId(name);
-					UtilConstants.setUserId(userId);
-					//dboper.addSensorsToList(userId);
-					RequestDispatcher rd = request.getRequestDispatcher("userDashBoard.jsp");
-					rd.forward(request, response);
-				} else {
+			if(action2!=null){
+				RequestDispatcher rd = request.getRequestDispatcher("register.jsp");
+				rd.forward(request, response);
+			}
+			if (action1!=null) {
+				DBConnections dBConnection = new DBConnections();
+				Connection con = dBConnection.createDbConnection();
+				Statement st0 = con.createStatement();
+				int userId = 0;
+				
+				
+				String query0 = ("select user_id from user where email_id ='"+name+"'");
+				ResultSet rs0 = st0.executeQuery(query0);
+				if(rs0!=null && rs0.next()){
+					userId = rs0.getInt(1);
+					
+					String query1 = ("select * from auth_table where user_id = "+userId+" and password_val='"+password+"'");
+					ResultSet rs1 = st0.executeQuery(query1);
+					
+					if(rs1!=null && rs1.next()){
+						RequestDispatcher rd = request.getRequestDispatcher("userDashBoard.jsp");
+						rd.forward(request, response);
+						UtilConstants.setUserId(Integer.toString(userId));
+						session.setAttribute("userId", UtilConstants.getUserId());
+					}
+					else
+					{
+						request.setAttribute("error", "Incorrect email id or password..Please try again..!!");
+						RequestDispatcher rd = request.getRequestDispatcher("Login.jsp");
+						rd.forward(request, response);
+					}
+				}
+				else{
+					request.setAttribute("error", "Email id does not exit..Please try again or click on Register.!");
 					RequestDispatcher rd = request.getRequestDispatcher("Login.jsp");
 					rd.forward(request, response);
 				}
 				
-				session.setAttribute("userId", UtilConstants.getUserId());
 				
-			} else if (action.equals("Register")) {
-				RequestDispatcher rd = request.getRequestDispatcher("register.jsp");
-				rd.forward(request, response);
-			}
+				
+				
+			} 
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
