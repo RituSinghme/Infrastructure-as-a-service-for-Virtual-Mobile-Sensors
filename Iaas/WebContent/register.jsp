@@ -70,7 +70,7 @@
 			
 			<%
 			Register reg = new Register();
-   			Boolean success = reg.filldetails(request);  //System.out.println(success);
+   			Boolean success = reg.filldetails(request);  System.out.println(success);
    				if(request.getAttribute("err_msg")!=null && request.getAttribute("err_msg").toString().length()!=0)
    				{
    					%>
@@ -116,9 +116,13 @@
                 <div class="form-group">
                 	<input type="text" name="card_number" id="card_number" class="form-control input-lg" placeholder="Card Number" tabindex="5" required="required">
                	</div>
+               	
+               	<div class="form-group">
+                	<input type="text" name="exp_date" id="exp_date" class="form-control input-lg" placeholder="Expiry Date(mmyy)" tabindex="6" required="required">
+               	</div>
                             
                 <div class="form-group">
-                    <input type="text" name="cvv" id="cvv"  class="form-control input-lg" placeholder="CVV" tabindex="6" required="required">
+                    <input type="text" name="cvv" id="cvv"  class="form-control input-lg" placeholder="CVV" tabindex="7" required="required">
                 </div>
                             
                             
@@ -133,12 +137,12 @@
    
    
    
-	   <%
+	   <% System.out.println(success);
 
 	   if (success) { 
    	           response.sendRedirect("Login.jsp");
                 
-                 }
+                }
 
 	  
 	//}
