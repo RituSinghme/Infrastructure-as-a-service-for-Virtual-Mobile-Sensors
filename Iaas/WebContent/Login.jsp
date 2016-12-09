@@ -57,7 +57,7 @@ header, footer {
 			</div>
 			<input type="submit" name="action1" class="btn btn-primary" value="Submit">
 			<input type="submit" name="action2" class="btn btn-primary" value="Register"><br/><br/>
-			<h4><a  href="adminLogin.jsp">Admin Login</a></h4>
+			<!-- <h4><a  href="adminLogin.jsp">Admin Login</a></h4> -->
 		</form>
 	</div>
 </body>
