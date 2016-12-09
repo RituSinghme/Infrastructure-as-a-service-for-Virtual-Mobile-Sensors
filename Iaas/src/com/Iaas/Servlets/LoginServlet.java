@@ -37,10 +37,27 @@ public class LoginServlet extends HttpServlet {
 			String password = request.getParameter("password");
 			String action1 = request.getParameter("action1");
 			String action2 = request.getParameter("action2");
+			String adminLogin = request.getParameter("adminLogin");
 			HttpSession session = request.getSession();
+			
 			if(action2!=null){
 				RequestDispatcher rd = request.getRequestDispatcher("register.jsp");
 				rd.forward(request, response);
+			}
+			if(adminLogin!=null){
+				String adminname = request.getParameter("adminname");
+				String adminpwd = request.getParameter("adminpwd");
+				
+				if(adminname!=null && adminname.equalsIgnoreCase("admin") && adminpwd!=null && adminpwd.equalsIgnoreCase("admin")){
+					RequestDispatcher rd = request.getRequestDispatcher("adminDashBoard.jsp");
+					rd.forward(request, response);
+				}
+				else
+				{
+					request.setAttribute("adminerror", "Invalid name or password.. Please try again");
+					RequestDispatcher rd = request.getRequestDispatcher("adminLogin.jsp");
+					rd.forward(request, response);
+				}
 			}
 			if (action1!=null) {
 				DBConnections dBConnection = new DBConnections();
@@ -77,7 +94,7 @@ public class LoginServlet extends HttpServlet {
 				}
 				
 				
-				
+				dBConnection.closeConnection(con);
 				
 			} 
 		} catch (ClassNotFoundException e) {
