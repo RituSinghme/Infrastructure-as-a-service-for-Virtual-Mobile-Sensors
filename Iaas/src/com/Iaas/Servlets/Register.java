@@ -29,20 +29,22 @@ public class Register extends HttpServlet{
 	   	String email_id = request.getParameter("email_id");
 	   	String password = request.getParameter("password");
 	   	String name_on_card = request.getParameter("name_on_card");
-		String card_number = request.getParameter("card_number");
-		String exp_date = request.getParameter("exp_date");
-		String cvv = request.getParameter("cvv");
+	   	
+	   	if(request.getParameter("card_number")!=null){
+		Long card_number = Long.parseLong(request.getParameter("card_number").toString());
+		int exp_date = Integer.parseInt(request.getParameter("exp_date").toString());
+		int cvv = Integer.parseInt(request.getParameter("cvv").toString());
 		
 		
-		String user_id = null;
+		int user_id = 0;
 		
 		 Connection connection = null;
 	     PreparedStatement pstatement = null;
 	     
 	     	        
-		if ((card_number != null && card_number.length() != 0) &&
-				(exp_date != null && exp_date.length() != 0) &&
-				(cvv != null && cvv.length() != 0) &&
+		if ((card_number != 0) &&
+				(exp_date != 0 )&&
+				(cvv != 0) &&
 				(name != null && name.length() != 0) &&
 				(email_id != null && email_id.length() != 0))
 		
@@ -55,7 +57,7 @@ public class Register extends HttpServlet{
 			try {
 				Class.forName("com.mysql.jdbc.Driver");
 
-				connection = DriverManager.getConnection("jdbc:mysql://team18-instance1.c2s2dfvr9r2j.us-west-1.rds.amazonaws.com:3306/Wedding_Planner?useSSL=false",
+				connection = DriverManager.getConnection("jdbc:mysql://team18-instance1.c2s2dfvr9r2j.us-west-1.rds.amazonaws.com:3306/team18dB1?useSSL=false",
 						"team18user", "team18pass");
 				
 				String query0 = ("select * from user where email_id = '" + email_id +"'");
@@ -76,12 +78,15 @@ public class Register extends HttpServlet{
 				String query1 = ("select max(user_id) from user");
 				pstatement = connection.prepareStatement(query1);
 				ResultSet us = pstatement.executeQuery();
-				if (us != null && us.next()) {
-					user_id = us.getString(1); System.out.println(user_id);
+				if (us != null && us.next()) 
+					user_id = us.getInt(1)+1;
+				else
+						user_id=1;
+					System.out.println(user_id);
 				
-				String queryString1 = ("insert into user(user_id, name, email_id, phone_no) VALUES (?, ?, ?)");
+				String queryString1 = ("insert into user(user_id, name, email_id, phone_no) VALUES (?, ?, ?,?)");
 				pstatement = connection.prepareStatement(queryString1);
-				pstatement.setString(1, user_id);
+				pstatement.setInt(1, user_id);
 				pstatement.setString(2, name);
 				pstatement.setString(3, email_id);
 				pstatement.setString(4, phone_no);
@@ -93,7 +98,7 @@ public class Register extends HttpServlet{
 
 					String queryString2 = ("insert into auth_table(user_id,username,password_val) values (?,?,?)");
 					pstatement = connection.prepareStatement(queryString2);
-					pstatement.setString(1, user_id);
+					pstatement.setInt(1, user_id);
 					pstatement.setString(2, username);
 					pstatement.setString(3, password);
 					insertQuery2 = pstatement.executeUpdate();
@@ -103,36 +108,37 @@ public class Register extends HttpServlet{
 
 					String query3 = ("insert into card_details(user_id,exp_date,cvv,name_on_card,card_number) values (?,?,?,?,?)");
 					pstatement = connection.prepareStatement(query3);
-					pstatement.setString(1, user_id);
-					pstatement.setString(2, exp_date);
-					pstatement.setString(2, cvv);
-					pstatement.setString(2, name_on_card);
-					pstatement.setString(2, card_number);
+					pstatement.setInt(1, user_id);
+					pstatement.setInt(2, exp_date);
+					pstatement.setInt(3, cvv);
+					pstatement.setString(4, name_on_card);
+					pstatement.setLong(5, card_number);
 					
 					insertQuery3 = pstatement.executeUpdate();
 					
 					System.out.println(query3); 
-				}
+				
 
 				if (insertQuery1 != 0 && insertQuery2 != 0 && insertQuery3 != 0)
 					success = true; System.out.println("all executed"); 
 
-			} catch (Exception ex) {
+			} 
+			catch (Exception ex) {
 				System.out.println("Unable to connect to database.");
 
 			} finally {
-				// close all the connections.
+				
 				try {
-					//pstatement.close();
-
-					connection.close();
-				} catch (SQLException e) {
+					//connection.close();
+				} catch (Exception e) {
 					System.out.println(e);
 				}
 			}
 		}
+	   	}
 
 		return success;
 	}
+	   	
 
 }
