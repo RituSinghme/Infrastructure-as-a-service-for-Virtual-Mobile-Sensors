@@ -69,6 +69,9 @@ public class InstancesUtilility {
 		// Configure and map the Sensor to a Hub
 		DBOperations dbOperations = new DBOperations();
 		String hubName = dbOperations.configureSensortoHub(sensorId, location);
+		
+		// Insert Sensor hub details
+		dbOperations.insertSensorHubDetails(sensorId, hubName);
 		return hubName;
 	}
 

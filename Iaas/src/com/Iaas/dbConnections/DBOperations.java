@@ -147,6 +147,11 @@ public class DBOperations {
 		return hubName;
 	}
 	
+	public void insertSensorHubDetails(String sensorId, String location) throws ClassNotFoundException, SQLException{
+		DBConnections dbConn = new DBConnections();
+		dbConn.insertSensorHubDetails(sensorId, location);
+	}
+	
 	// Billing Module @ Author -- Anushree
 	
 	public List<BillingDetails> viewBillDetails(String userId) throws ClassNotFoundException, SQLException{

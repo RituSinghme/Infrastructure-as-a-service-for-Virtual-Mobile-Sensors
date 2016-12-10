@@ -419,6 +419,30 @@ public class DBConnections {
 		closeConnection(dBConnection);
 	}
 	
+	public void insertSensorHubDetails(String sensorId, String location) throws SQLException, ClassNotFoundException{
+		Connection dBConnection = createDbConnection();
+		String insertData = "insert into hub_sensor_details values (?,?)";
+		PreparedStatement ps = dBConnection.prepareStatement(insertData);
+		int hubId = getHubId(location);
+		ps.setInt(1, hubId);
+		ps.setString(2, sensorId);
+		ps.executeUpdate();
+		closeConnection(dBConnection);
+	}
+	
+	public static int getHubId(String location) throws ClassNotFoundException, SQLException{
+		Connection dBConnection = createDbConnection();
+		Statement stmt = dBConnection.createStatement();
+		String query = "select hub_Id from hub_details where place="+"'"+location+"'"+";";
+		int hubId = 0;
+		ResultSet result = stmt.executeQuery(query);
+		while (result.next()) {
+			hubId = result.getInt("hub_Id");
+		}
+		closeConnection(dBConnection);
+		return hubId;
+	}
+	
 	//Billing Module -- @ Author Anushree
 	
 	public static int calculateSessionCost(String startTime, Date endTime) throws ParseException{

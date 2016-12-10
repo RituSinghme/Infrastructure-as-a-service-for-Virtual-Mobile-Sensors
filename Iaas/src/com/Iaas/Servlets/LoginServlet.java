@@ -18,7 +18,6 @@ import javax.servlet.http.HttpSession;
 
 import com.Iaas.Util.UtilConstants;
 import com.Iaas.dbConnections.DBConnections;
-import com.Iaas.dbConnections.DBOperations;
 
 /**
  * @author Rahul
@@ -32,7 +31,6 @@ public class LoginServlet extends HttpServlet {
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		try {
-			DBOperations dboper = new DBOperations();
 			String name = request.getParameter("name");
 			String password = request.getParameter("password");
 			String action1 = request.getParameter("action1");
@@ -60,8 +58,7 @@ public class LoginServlet extends HttpServlet {
 				}
 			}
 			if (action1!=null) {
-				DBConnections dBConnection = new DBConnections();
-				Connection con = dBConnection.createDbConnection();
+				Connection con = DBConnections.createDbConnection();
 				Statement st0 = con.createStatement();
 				int userId = 0;
 				
@@ -94,7 +91,7 @@ public class LoginServlet extends HttpServlet {
 				}
 				
 				
-				dBConnection.closeConnection(con);
+				DBConnections.closeConnection(con);
 				
 			} 
 		} catch (ClassNotFoundException e) {
