@@ -4,7 +4,6 @@
 package com.Iaas.Servlets;
 
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,13 +14,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.Iaas.Util.InstancesUtilility;
+import com.Iaas.dbConnections.DBOperations;
 
 /**
  * @author Rahul
  *
  */
-public class CreateSensorServlet extends HttpServlet {
+public class CreateHubServlet extends HttpServlet {
 	/**
 	 * 
 	 */
@@ -31,8 +30,8 @@ public class CreateSensorServlet extends HttpServlet {
 		try {
 			String places = request.getParameter("myPlace");
 			String place = "";
-			String typeOfSensor = request.getParameter("dropdown");
 			List<String> placeString = new ArrayList<>(Arrays.asList(places.split("</span>")));
+			System.out.println(placeString);
 			for (String loc : placeString) {
 				if (loc.contains("\"street-address\">")) {
 					List<String> p = new ArrayList<>(Arrays.asList(loc.split("\"street-address\">")));
@@ -56,15 +55,11 @@ public class CreateSensorServlet extends HttpServlet {
 					place = place + p.get(p.size() - 1);
 				}
 			}
-			// Sensor Data being Inserted.
-			InstancesUtilility iu = new InstancesUtilility();
-			String hubName = iu.createSensorInstance(typeOfSensor, place);
-
-			request.setAttribute("HubName", hubName);
-			RequestDispatcher rd = request.getRequestDispatcher("sensorSuccess.jsp");
+			// Sensor Hub being created.
+			DBOperations dboper = new DBOperations();
+			dboper.createHub(place);
+			RequestDispatcher rd = request.getRequestDispatcher("adminDashBoard.jsp");
 			rd.forward(request, response);
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

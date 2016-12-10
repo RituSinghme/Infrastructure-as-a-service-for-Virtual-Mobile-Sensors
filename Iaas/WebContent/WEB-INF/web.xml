@@ -5,7 +5,7 @@
 	id="WebApp_ID" version="3.0">
 	<display-name>Iaas</display-name>
 	<welcome-file-list>
-		<welcome-file>Login.jsp</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
 	<servlet>
 		<servlet-name>Login Servlet</servlet-name>
@@ -23,6 +23,15 @@
 	<servlet-mapping>
 		<servlet-name>createSensorServlet</servlet-name>
 		<url-pattern>/createSensor</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>createHubServlet</servlet-name>
+		<servlet-class>com.Iaas.Servlets.CreateHubServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>createHubServlet</servlet-name>
+		<url-pattern>/createHub</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -61,21 +70,21 @@
 		<url-pattern>/terminateSensor</url-pattern>
 	</servlet-mapping>
 	<servlet>
-  <servlet-name>billing</servlet-name>
-    <servlet-class>com.Iaas.Servlets.BillingServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>billing</servlet-name>
-    <url-pattern>/billing</url-pattern>
-  </servlet-mapping>
-<servlet>  
-  <servlet-name>payment</servlet-name>
-    <servlet-class>com.Iaas.Servlets.PaymentServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>payment</servlet-name>
-    <url-pattern>/payment</url-pattern>
-  </servlet-mapping>
+		<servlet-name>billing</servlet-name>
+		<servlet-class>com.Iaas.Servlets.BillingServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>billing</servlet-name>
+		<url-pattern>/billing</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>payment</servlet-name>
+		<servlet-class>com.Iaas.Servlets.PaymentServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>payment</servlet-name>
+		<url-pattern>/payment</url-pattern>
+	</servlet-mapping>	
 	<listener>
 		<listener-class>com.Iaas.Util.Listener</listener-class>
 	</listener>

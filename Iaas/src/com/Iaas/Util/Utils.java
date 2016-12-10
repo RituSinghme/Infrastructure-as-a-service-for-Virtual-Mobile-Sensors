@@ -18,6 +18,9 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import org.gavaghan.geodesy.Ellipsoid;
+import org.gavaghan.geodesy.GeodeticCalculator;
+import org.gavaghan.geodesy.GlobalPosition;
 import org.w3c.dom.Document;
 
 /**
@@ -81,5 +84,14 @@ public class Utils {
 		};
 		Timer timer = new Timer();
 		timer.scheduleAtFixedRate(task, 0, 3600000);
+	}
+	
+	public double getDistanceBetweenLatLng(String latPlace, String lonPlace, String latHub, String lonHub){
+		GeodeticCalculator geoCalc = new GeodeticCalculator();
+		Ellipsoid reference = Ellipsoid.WGS84;  
+		GlobalPosition pointA = new GlobalPosition(Double.parseDouble(latPlace), Double.parseDouble(lonPlace), 0.0); // Point A
+		GlobalPosition userPos = new GlobalPosition(Double.parseDouble(latHub), Double.parseDouble(lonHub), 0.0); // Point B
+		double distance = geoCalc.calculateGeodeticCurve(reference, userPos, pointA).getEllipsoidalDistance();
+		return distance;
 	}
 }

@@ -1,3 +1,5 @@
+
+
 /**
  * 
  */
@@ -5,21 +7,23 @@ package com.Iaas.dbConnections;
 
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import com.Iaas.Util.InstancesUtilility;
 import com.Iaas.Util.UtilConstants;
 import com.Iaas.Util.Utils;
-import com.Iaas.VO.SensorVO;
-import com.Iaas.VO.UserSensorDeatailVO;
-import com.Iaas.VO.UserSensorVO;
-import com.Iaas.VO.ViewSensorDetailsVO;
 import com.Iaas.VO.BillingDetails;
 import com.Iaas.VO.Card_details;
 import com.Iaas.VO.Invoice;
 import com.Iaas.VO.PaymentHistory;
+import com.Iaas.VO.SensorVO;
+import com.Iaas.VO.UserSensorDeatailVO;
+import com.Iaas.VO.UserSensorVO;
+import com.Iaas.VO.ViewSensorDetailsVO;
 
 /**
  * @author Rahul
@@ -108,6 +112,40 @@ public class DBOperations {
 		dbConn.fetchPlacesList();
 	}
 	
+	// Hub Creation and inserting hub details in a static map
+	public void createHub(String place) throws Exception{
+		Utils util = new Utils();
+		String latlng[] = util.getLatLongPositions(place);
+		DBConnections dbConn = new DBConnections();
+		dbConn.insertHubDetails(place, latlng);
+		
+		Map<String, String[]> hub = UtilConstants.getHubDetails();
+		hub.put(place, latlng);
+		UtilConstants.setHubDetails(hub);
+	}
+	
+	public void createHubsList() throws ClassNotFoundException, SQLException{
+		DBConnections dbconn =new DBConnections();
+		dbconn.getHubDetails();
+	}
+	
+	public String configureSensortoHub(String sensorId, String place) throws Exception{
+		Utils util = new Utils();
+		double distance = Double.MAX_VALUE;
+		String hubName = "";
+		String[] latlngPlace = util.getLatLongPositions(place);
+		Map<String, String[]> hubMap=new HashMap<>();
+		hubMap = UtilConstants.getHubDetails();
+		for(String loc: hubMap.keySet()){
+			String[] latlngHub = hubMap.get(loc);
+			double hubDistance = util.getDistanceBetweenLatLng(latlngPlace[0], latlngPlace[1], latlngHub[0], latlngHub[1]);
+			if(hubDistance<distance){
+				distance = hubDistance;
+				hubName = loc;
+			}
+		}
+		return hubName;
+	}
 	
 	// Billing Module @ Author -- Anushree
 	

@@ -43,7 +43,8 @@ public class Listener implements ServletContextListener {
 		Utils util = new Utils();
 			try {
 				dbOper.getLocationsList();
-				util.startFetchingData();
+				dbOper.createHubsList();
+				//util.startFetchingData();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			} catch (SQLException e) {

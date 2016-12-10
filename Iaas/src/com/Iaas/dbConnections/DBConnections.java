@@ -14,7 +14,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,6 +24,7 @@ import com.Iaas.Util.UtilConstants;
 import com.Iaas.Util.Utils;
 import com.Iaas.VO.BillingDetails;
 import com.Iaas.VO.Card_details;
+import com.Iaas.VO.HubVO;
 import com.Iaas.VO.Invoice;
 import com.Iaas.VO.PaymentHistory;
 import com.Iaas.VO.SensorTypeVO;
@@ -385,6 +388,37 @@ public class DBConnections {
 		closeConnection(dBConnection);
 	}
 	
+	// hub connections
+	public void insertHubDetails(String place, String[] latlng) throws ClassNotFoundException, SQLException {
+		Connection dBConnection = createDbConnection();
+		String insertData = "insert into hub_details" + " (place, latitude, longitude)" + " values" + "(?,?,?)";
+		PreparedStatement ps = dBConnection.prepareStatement(insertData);
+		ps.setString(1, place);
+		ps.setString(2, latlng[0]);
+		ps.setString(3, latlng[1]);
+		ps.executeUpdate();
+		closeConnection(dBConnection);
+	}
+	
+	public void getHubDetails() throws ClassNotFoundException, SQLException{
+		Connection dBConnection = createDbConnection();
+		Statement stmt = dBConnection.createStatement();
+		Map<String,String[]> hubList = new HashMap<>();
+		String query = "select place, latitude, longitude from hub_details;";
+		ResultSet result = stmt.executeQuery(query);
+		while (result.next()) {
+			HubVO hub = new HubVO();
+			hub.setName(result.getString("place"));
+			String[] s = new String[2];
+			s[0]=result.getString("latitude");
+			s[1]=result.getString("longitude");
+			hub.setLatlng(s);
+			hubList.put(hub.getName(), hub.getLatlng());
+		}
+		UtilConstants.setHubDetails(hubList);
+		closeConnection(dBConnection);
+	}
+	
 	//Billing Module -- @ Author Anushree
 	
 	public static int calculateSessionCost(String startTime, Date endTime) throws ParseException{
@@ -449,7 +483,6 @@ public class DBConnections {
 	
 	public void createinvoice(HttpServletRequest request,String userId) throws ClassNotFoundException, SQLException{
 		Connection dBConnection = createDbConnection();
-		List<Invoice> invoice = new ArrayList<>();
 		int bill_id = 0;
 		int amount_paid = Integer.parseInt(request.getParameter("amt").toString());
 		

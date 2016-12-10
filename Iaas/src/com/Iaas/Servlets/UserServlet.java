@@ -41,7 +41,8 @@ public class UserServlet extends HttpServlet{
 			InstancesUtilility iu = new InstancesUtilility();
 			iu.createSensorInstance("Pressure", place);
 		} catch (ClassNotFoundException | SQLException e) {
-			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		RequestDispatcher rd = request.getRequestDispatcher("register.jsp");
