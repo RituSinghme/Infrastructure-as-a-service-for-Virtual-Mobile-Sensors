@@ -124,10 +124,10 @@ public class DBConnections {
 		int locationId = 0;
 		Connection dBConnection = createDbConnection();
 		Statement stmt = dBConnection.createStatement();
-		String query = "Select location_id from sensor where city=" + '"' + location + '"'+";";
+		String query = "Select hub_Id from hub_details where place=" + "'"+location+"'"+";";
 		ResultSet result = stmt.executeQuery(query);
 		while (result.next()) {
-			locationId = result.getInt("location_id");
+			locationId = result.getInt("hub_Id");
 		}
 		closeConnection(dBConnection);
 		return locationId;

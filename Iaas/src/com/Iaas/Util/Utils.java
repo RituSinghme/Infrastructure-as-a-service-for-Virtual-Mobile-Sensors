@@ -8,6 +8,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -20,6 +22,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.gavaghan.geodesy.Ellipsoid;
 import org.gavaghan.geodesy.GeodeticCalculator;
+import org.gavaghan.geodesy.GlobalCoordinates;
 import org.gavaghan.geodesy.GlobalPosition;
 import org.w3c.dom.Document;
 
@@ -55,42 +58,72 @@ public class Utils {
 		}
 		return null;
 	}
-	
-	public String getCurrentTime(){
+
+	public String getCurrentTime() {
 		Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat();
-        String timeStamp = sdf.format(calendar.getTime());
+		SimpleDateFormat sdf = new SimpleDateFormat();
+		String timeStamp = sdf.format(calendar.getTime());
 		return timeStamp;
 	}
-	
-	public void startFetchingData(){
+
+	public void startFetchingData() {
 		TimerTask task = new TimerTask() {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
-				for(String city : UtilConstants.getCitiesList()){
-					Utils util = new Utils();
-					try {
+				Map<String, String[]> hub = new HashMap<>();
+				hub = UtilConstants.getHubDetails();
+				try {
+					for (String city : hub.keySet()) {
 						System.out.println(city);
-						String[] latlng=util.getLatLongPositions(city);
 						SensorData data = new SensorData();
-						data.fetchData(UtilConstants.weatherURLLat+latlng[0]+UtilConstants.weatherURLLong+latlng[1]+
-								UtilConstants.weatherURLAppID, city);
-					} catch (Exception e) {
-						e.printStackTrace();
+						// String[] latlng = hub.get(city);
+						String[] latlng = this.circleCalc(hub.get(city));
+						System.out.println(latlng[0]+", "+latlng[1]);
+						data.fetchData(UtilConstants.weatherURLLat + latlng[0] + UtilConstants.weatherURLLong
+								+ latlng[1] + UtilConstants.weatherURLAppID, city);
 					}
+					UtilConstants.angle += 30;
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
+			}
+
+			private String[] circleCalc(String[] strings) {
+				// TODO Auto-generated method stub
+				String latLng[] = new String[2];
+				GeodeticCalculator geoCalc = new GeodeticCalculator();
+
+				// select a reference elllipsoid
+				Ellipsoid reference = Ellipsoid.WGS84;
+
+				GlobalCoordinates location;
+				location = new GlobalCoordinates(Double.parseDouble(strings[0]), Double.parseDouble(strings[1]));
+
+				// set the direction and distance
+				double startBearing = UtilConstants.angle;
+				double distance = UtilConstants.distance;
+				System.out.println(UtilConstants.angle);
+				// find the destination
+				double[] endBearing = new double[1];
+				GlobalCoordinates dest = geoCalc.calculateEndingGlobalCoordinates(reference, location, startBearing,
+						distance, endBearing);
+				latLng[0] = Double.toString(dest.getLatitude());
+				latLng[1] = Double.toString(dest.getLongitude());
+				return latLng;
 			}
 		};
 		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(task, 0, 3600000);
+		timer.scheduleAtFixedRate(task, 0, 180000);
 	}
-	
-	public double getDistanceBetweenLatLng(String latPlace, String lonPlace, String latHub, String lonHub){
+
+	public double getDistanceBetweenLatLng(String latPlace, String lonPlace, String latHub, String lonHub) {
 		GeodeticCalculator geoCalc = new GeodeticCalculator();
-		Ellipsoid reference = Ellipsoid.WGS84;  
-		GlobalPosition pointA = new GlobalPosition(Double.parseDouble(latPlace), Double.parseDouble(lonPlace), 0.0); // Point A
-		GlobalPosition userPos = new GlobalPosition(Double.parseDouble(latHub), Double.parseDouble(lonHub), 0.0); // Point B
+		Ellipsoid reference = Ellipsoid.WGS84;
+		GlobalPosition pointA = new GlobalPosition(Double.parseDouble(latPlace), Double.parseDouble(lonPlace), 0.0); // Point
+																														// A
+		GlobalPosition userPos = new GlobalPosition(Double.parseDouble(latHub), Double.parseDouble(lonHub), 0.0); // Point
+																													// B
 		double distance = geoCalc.calculateGeodeticCurve(reference, userPos, pointA).getEllipsoidalDistance();
 		return distance;
 	}
