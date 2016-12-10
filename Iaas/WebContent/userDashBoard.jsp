@@ -129,9 +129,6 @@
 				
 				<br><br>
 				
-				<div class="row text-center pad-top">
-				<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"></div>
-				<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"></div>
 					<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6">
 						<div class="div-square">
 							<a href="user_usageDashboard.jsp"> <i class="fa fa-circle-o-notch fa-5x"></i>
@@ -140,13 +137,7 @@
 						</div>
 					</div>
 					
-					<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6">
-						<div class="div-square">
-							<a href="blank.html"> <i class="fa fa-circle-o-notch fa-5x"></i>
-								<h4>User Feedback</h4>
-							</a>
-						</div>
-					</div>
+					
 					<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"></div>
 					<div class="col-lg-2 col-md-2 col-sm-2 col-xs-6"></div>
 				</div>
